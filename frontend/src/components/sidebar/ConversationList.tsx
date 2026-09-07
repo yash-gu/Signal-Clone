@@ -43,30 +43,12 @@ export default function ConversationList() {
 
   // Search logic
   useEffect(() => {
-    if (!searchQuery.trim() || !token) {
+    if (!searchQuery.trim()) {
       setIsSearching(false);
-      setSearchResults([]);
       return;
     }
-    
     setIsSearching(true);
-    const delay = setTimeout(() => {
-      fetch(`/api/users/search?q=${encodeURIComponent(searchQuery)}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) {
-          setSearchResults(data);
-        } else {
-          console.error("Expected array for search results but got:", data);
-          setSearchResults([]);
-        }
-      })
-      .catch(console.error);
-    }, 300);
-    return () => clearTimeout(delay);
-  }, [searchQuery, token]);
+  }, [searchQuery]);
 
   const handleContactClick = async (contactId: number) => {
     try {
@@ -123,30 +105,62 @@ export default function ConversationList() {
       
       {/* List */}
       <div className="flex-1 overflow-y-auto px-space-xs space-y-space-2xs divide-y divide-transparent pb-4">
-        {isSearching ? (
-          <div className="px-2">
-            <h3 className="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider mb-2 pl-2 mt-2">Contacts</h3>
-            {searchResults.length === 0 ? (
-              <p className="text-body-sm text-on-surface-variant p-2 text-center mt-4">No contacts found</p>
-            ) : (
-              searchResults.map(user => (
-                <div 
-                  key={user.id}
-                  onClick={() => handleContactClick(user.id)}
-                  className="flex items-center gap-space-md p-space-sm rounded-xl cursor-pointer transition-all hover:bg-surface-container-low"
-                >
-                  <div className="w-10 h-10 rounded-full bg-surface-container-high text-primary flex items-center justify-center font-headline-sm">
-                    {user.display_name.charAt(0).toUpperCase()}
+        {isSearching ? (() => {
+          const term = searchQuery.toLowerCase();
+          const filteredConvs = conversations.filter(c => {
+            const nameMatch = c.name?.toLowerCase().includes(term);
+            const participantMatch = c.participants?.some((p: any) => 
+                p.user?.display_name?.toLowerCase().includes(term) || 
+                p.user?.username?.toLowerCase().includes(term)
+            );
+            return nameMatch || participantMatch;
+          });
+          
+          if (filteredConvs.length === 0) {
+            return (
+              <div className="px-2">
+                <h3 className="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider mb-2 pl-2 mt-2">Contacts</h3>
+                <p className="text-body-sm text-on-surface-variant p-2 text-center mt-4">No contacts found</p>
+              </div>
+            );
+          }
+          
+          return (
+            <div className="px-2">
+              <h3 className="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider mb-2 pl-2 mt-2">Contacts</h3>
+              {filteredConvs.map(conv => {
+                let displayName = conv.name || "Unknown Conversation";
+                if (!conv.is_group && conv.participants) {
+                  const otherUser = conv.participants.find((p: any) => p.user_id !== user?.id);
+                  if (otherUser && otherUser.user) {
+                    displayName = otherUser.user.display_name || otherUser.user.username;
+                  }
+                }
+                return (
+                  <div 
+                    key={conv.id}
+                    onClick={() => {
+                      setActiveConversation(conv.id);
+                      setSearchQuery("");
+                    }}
+                    className="flex items-center gap-space-md p-space-sm rounded-xl cursor-pointer transition-all hover:bg-surface-container-low"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-surface-container-high text-primary flex items-center justify-center font-headline-sm overflow-hidden">
+                      {conv.is_group ? (
+                        <span className="material-symbols-outlined text-[20px]">hub</span>
+                      ) : (
+                        displayName.charAt(0).toUpperCase()
+                      )}
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-headline-sm text-headline-sm text-on-surface">{displayName}</span>
+                    </div>
                   </div>
-                  <div className="flex flex-col">
-                    <span className="font-headline-sm text-headline-sm text-on-surface">{user.display_name}</span>
-                    <span className="font-body-sm text-body-sm text-on-surface-variant">@{user.username}</span>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        ) : (() => {
+                );
+              })}
+            </div>
+          );
+        })() : (() => {
           const displayedConversations = filterUnread ? conversations.filter(c => c.unread_count > 0) : conversations;
           if (displayedConversations.length === 0) {
             return (

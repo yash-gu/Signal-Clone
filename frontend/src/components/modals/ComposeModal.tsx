@@ -53,7 +53,10 @@ export default function ComposeModal({ onClose }: ComposeModalProps) {
       })
       .then(res => res.json())
       .then(data => {
-        const filtered = data.filter((u: any) => !selectedContacts.some(c => c.id === u.id));
+        let filtered = data.filter((u: any) => !selectedContacts.some(c => c.id === u.id));
+        if (mode === "add_contact") {
+          filtered = filtered.filter((u: any) => !contacts.some(c => c.id === u.id));
+        }
         setSearchResults(filtered);
       })
       .catch(console.error);
