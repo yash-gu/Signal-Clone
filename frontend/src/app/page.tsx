@@ -25,9 +25,12 @@ export default function Home() {
       setError(null);
       
       if (authStep === "identifier") {
-        if (identifierType === "phone" && phone.trim().length < 5) {
-          setError("Please enter a valid phone number.");
-          return;
+        if (identifierType === "phone") {
+          const digitsOnly = phone.replace(/\D/g, "");
+          if (digitsOnly.length < 7) {
+            setError("Please enter a valid phone number (digits only).");
+            return;
+          }
         }
         if (identifierType === "username" && username.trim().length < 3) {
           setError("Please enter a valid username.");
