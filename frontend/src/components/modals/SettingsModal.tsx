@@ -73,40 +73,99 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
           
           <div className="p-8 flex-1 overflow-y-auto">
             {activeTab === "account" && (
-              <div className="max-w-md space-y-6">
-                <div>
-                  <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4 uppercase tracking-wider">Profile</h3>
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-4">
-                       <div className="w-16 h-16 rounded-full bg-[#2C6BED] text-white flex items-center justify-center font-bold text-2xl">
-                        {displayName.charAt(0).toUpperCase() || "S"}
-                       </div>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 dark:text-neutral-300 mb-1">Display Name</label>
-                      <input 
-                        type="text" 
-                        value={displayName} 
-                        onChange={(e) => setDisplayName(e.target.value)}
-                        className="w-full bg-slate-50 dark:bg-[#18181b] border border-slate-200 dark:border-neutral-800 text-slate-900 dark:text-white rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-[#2C6BED]/50 transition-all" 
-                      />
-                    </div>
+              <div className="w-full max-w-2xl mx-auto mt-8 flex flex-col items-center">
+                {/* Avatar Section */}
+                <div className="flex flex-col items-center mb-10">
+                  <div className="w-24 h-24 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-3xl font-medium mb-3">
+                    {user?.avatar_url ? (
+                      <img src={user.avatar_url} alt={displayName} className="w-full h-full object-cover rounded-full" />
+                    ) : (
+                      displayName.substring(0, 2).toUpperCase() || "YG"
+                    )}
+                  </div>
+                  <button className="px-4 py-1.5 bg-white/10 hover:bg-white/20 transition-colors text-white text-sm font-medium rounded-full">
+                    Edit photo
+                  </button>
+                </div>
+
+                {/* Profile Info Section */}
+                <div className="w-full max-w-xl self-start">
+                  <div className="flex items-center gap-4 text-white mb-6">
+                    <span className="material-symbols-outlined text-[24px] text-neutral-400">person</span>
+                    <span className="text-[15px]">{displayName || "Yash Gupta"}</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-4 text-white mb-4">
+                    <span className="material-symbols-outlined text-[24px] text-neutral-400">edit</span>
+                    <span className="text-[15px]">About</span>
+                  </div>
+                  
+                  <div className="text-neutral-400 text-sm mb-8 pl-10">
+                    Your profile and changes to it will be visible to people you message, contacts and groups.
+                  </div>
+
+                  <div className="h-px bg-neutral-800 w-full mb-8"></div>
+
+                  <div className="flex items-center gap-4 text-white mb-4">
+                    <span className="material-symbols-outlined text-[24px] text-neutral-400">alternate_email</span>
+                    <span className="text-[15px]">{user?.username || "Username"}</span>
+                  </div>
+                  
+                  <div className="text-neutral-400 text-sm pl-10">
+                    People can now message you using your optional username so you don't have to give out your phone number.
                   </div>
                 </div>
-                
               </div>
             )}
 
             {activeTab === "appearance" && (
-              <div className="max-w-md space-y-6">
-                <div>
-                  <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4 uppercase tracking-wider">Theme</h3>
-                  <div className="bg-slate-50 dark:bg-[#18181b] border border-slate-200 dark:border-neutral-800 rounded-xl p-4 flex items-center justify-between">
-                    <div>
-                      <div className="font-medium text-slate-900 dark:text-white">Dark Mode</div>
-                      <div className="text-sm text-slate-500 dark:text-neutral-400">Toggle dark and light theme</div>
+              <div className="w-full max-w-2xl mx-auto mt-4">
+                <div className="bg-[#1e1e1e] border border-neutral-800 rounded-2xl overflow-hidden">
+                  <div className="px-5 py-4 flex items-center justify-between hover:bg-white/5 cursor-pointer transition-colors border-b border-neutral-800">
+                    <div className="flex items-center gap-4 text-white">
+                      <span className="material-symbols-outlined text-[20px] text-neutral-400">language</span>
+                      <span className="text-[15px]">Language</span>
                     </div>
-                    <ThemeToggle />
+                    <div className="flex items-center gap-1 text-neutral-400 text-sm">
+                      System Language
+                      <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+                    </div>
+                  </div>
+                  
+                  <div className="px-5 py-4 flex items-center justify-between hover:bg-white/5 cursor-pointer transition-colors border-b border-neutral-800">
+                    <div className="flex items-center gap-4 text-white">
+                      <span className="material-symbols-outlined text-[20px] text-neutral-400">contrast</span>
+                      <span className="text-[15px]">Theme</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="px-3 py-1 bg-white/10 rounded-full flex items-center gap-2 text-sm text-white">
+                        System
+                        <span className="material-symbols-outlined text-[16px]">keyboard_arrow_down</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="px-5 py-4 flex items-center justify-between hover:bg-white/5 cursor-pointer transition-colors border-b border-neutral-800">
+                    <div className="flex items-center gap-4 text-white">
+                      <span className="material-symbols-outlined text-[20px] text-neutral-400">palette</span>
+                      <span className="text-[15px]">Chat color</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 rounded-full bg-blue-500 mr-2"></div>
+                    </div>
+                  </div>
+                  
+                  <div className="px-5 py-4 flex items-center justify-between hover:bg-white/5 cursor-pointer transition-colors">
+                    <div className="flex items-center gap-4 text-white">
+                      <span className="material-symbols-outlined text-[20px] text-neutral-400">zoom_in</span>
+                      <span className="text-[15px]">Zoom level</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="px-3 py-1 bg-white/10 rounded-full flex items-center gap-2 text-sm text-white">
+                        100%
+                        <span className="material-symbols-outlined text-[16px]">keyboard_arrow_down</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

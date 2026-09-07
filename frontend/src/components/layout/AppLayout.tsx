@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { useAuth } from "@/context/AuthContext";
+import { useUI } from "@/context/UIContext";
 import LeftRail from "./LeftRail";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -23,10 +24,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     );
   }
 
+  const { isLeftRailVisible } = useUI();
+
   // Authenticated layout (Standard app with sidebars and navigation)
   return (
     <div className="w-full h-screen overflow-hidden flex bg-white dark:bg-[#121214]">
-      <LeftRail />
+      {isLeftRailVisible && <LeftRail />}
       <main className="flex-1 flex h-full min-w-0">
         {children}
       </main>

@@ -81,26 +81,30 @@ export default function ConversationList() {
   return (
     <>
       {/* Filter Tabs / Search Bar */}
-      <div className="px-4 pb-3">
-        <div className="relative flex items-center">
+      <div className="px-4 pb-3 flex items-center gap-2">
+        <div className="relative flex-1 flex items-center">
           <span className="material-symbols-outlined absolute left-3 text-slate-400 dark:text-neutral-500 text-[18px] pointer-events-none">search</span>
           <input 
             type="text" 
-            placeholder="Search" 
+            placeholder={filterUnread ? "Search unread chats" : "Search"} 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-slate-100 dark:bg-[#2a2b2e] text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-neutral-500 pl-9 pr-10 py-1.5 rounded-lg text-sm outline-none focus:ring-1 focus:ring-blue-500 transition-all border border-transparent dark:border-[#383a3f]"
+            className="w-full bg-slate-100 dark:bg-[#2a2b2e] text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-neutral-500 pl-9 pr-8 py-2 rounded-xl text-sm outline-none focus:ring-1 focus:ring-blue-500 transition-all border border-transparent dark:border-[#383a3f]"
           />
-          {searchQuery ? (
+          {searchQuery && (
              <button onClick={() => setSearchQuery("")} className="absolute right-2 text-slate-400 hover:text-slate-600 dark:text-neutral-500 dark:hover:text-neutral-300">
                <span className="material-symbols-outlined text-[18px]">close</span>
              </button>
-          ) : (
-             <button onClick={() => setFilterUnread(!filterUnread)} className={`absolute right-2 transition-colors cursor-pointer ${filterUnread ? 'text-[#2C6BED]' : 'text-slate-400 hover:text-slate-600 dark:text-neutral-500 dark:hover:text-neutral-300'}`} title="Filter unread">
-               <span className="material-symbols-outlined text-[18px]">filter_list</span>
-             </button>
           )}
         </div>
+        
+        <button 
+          onClick={() => setFilterUnread(!filterUnread)} 
+          className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-colors cursor-pointer ${filterUnread ? 'bg-[#3b82f6] text-white' : 'text-slate-500 hover:bg-slate-100 dark:text-neutral-400 dark:hover:text-neutral-300 dark:hover:bg-[#2a2b2e]'}`} 
+          title="Filter unread"
+        >
+          <span className="material-symbols-outlined text-[20px]">filter_list</span>
+        </button>
       </div>
       
       {/* List */}
@@ -168,9 +172,24 @@ export default function ConversationList() {
           const displayedConversations = filterUnread ? conversations.filter(c => c.unread_count > 0) : conversations;
           if (displayedConversations.length === 0) {
             return (
-              <div className="flex flex-col items-center justify-center h-full pt-20">
-                <h2 className="text-slate-500 dark:text-neutral-400 font-medium">{filterUnread ? "No unread chats" : "No chats"}</h2>
-                <p className="text-slate-400 dark:text-neutral-500 text-xs mt-1">{filterUnread ? "You're all caught up!" : "Recent chats will appear here."}</p>
+              <div className="flex flex-col items-center h-full pt-12">
+                {filterUnread ? (
+                  <>
+                    <h2 className="text-slate-900 dark:text-white font-semibold mb-12">Filtered by unread</h2>
+                    <h3 className="text-slate-800 dark:text-neutral-300 font-medium text-lg">No unread chats</h3>
+                    <button 
+                      onClick={() => setFilterUnread(false)} 
+                      className="mt-6 px-6 py-2 bg-slate-200 dark:bg-[#383a3f] hover:bg-slate-300 dark:hover:bg-[#4a4d53] text-slate-900 dark:text-white font-medium rounded-full transition-colors"
+                    >
+                      Clear filter
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <h3 className="text-slate-800 dark:text-neutral-300 font-medium text-lg mt-32">No chats</h3>
+                    <p className="text-slate-500 dark:text-neutral-400 text-sm mt-2">Recent chats will appear here.</p>
+                  </>
+                )}
               </div>
             );
           }

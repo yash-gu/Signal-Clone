@@ -1,13 +1,26 @@
 import { useState } from "react";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import SettingsModal from "@/components/modals/SettingsModal";
+import { useUI } from "@/context/UIContext";
 
 export default function LeftRail() {
   const [showSettings, setShowSettings] = useState(false);
+  const { toggleLeftRail } = useUI();
 
   return (
     <aside className="w-14 shrink-0 flex flex-col justify-between items-center py-4 bg-slate-100 dark:bg-[#18181b] border-r border-slate-200 dark:border-neutral-800 z-40 h-full">
-      <nav className="w-full flex flex-col items-center gap-2 mt-2">
+      <nav className="w-full flex flex-col items-center gap-2">
+        {/* Toggle / Hamburger Icon */}
+        <div className="group relative">
+          <button 
+            onClick={toggleLeftRail} 
+            className="w-10 h-10 mb-4 rounded-full hover:bg-slate-200 dark:hover:bg-neutral-800 text-slate-600 dark:text-neutral-400 flex items-center justify-center transition-all" 
+            title="Hide Tabs"
+          >
+            <span className="material-symbols-outlined text-[20px]">menu</span>
+          </button>
+        </div>
+
         {/* Active Chat Icon */}
         <button className="w-10 h-10 rounded-xl bg-slate-200 dark:bg-neutral-800 text-slate-800 dark:text-neutral-200 flex items-center justify-center shadow-sm transition-transform active:scale-95" title="Chats">
           <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>chat</span>
