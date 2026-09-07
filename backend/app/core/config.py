@@ -5,6 +5,6 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "supersecretkey_for_signal_clone"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
-    DATABASE_URL: str = "data/signal_clone.db"
+    DATABASE_URL: str = "data/signal_v2.db"
 
 settings = Settings()

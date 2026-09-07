@@ -27,7 +27,7 @@ async def get_conversations(current_user: dict = Depends(get_current_user), db: 
         for row in rows:
             conv = dict(row)
             async with db.execute('''
-                SELECT p.user_id, u.username, u.display_name, u.phone_number 
+                SELECT p.user_id, p.is_admin, u.username, u.display_name, u.phone_number 
                 FROM participants p
                 JOIN users u ON p.user_id = u.id
                 WHERE p.conversation_id = ?
