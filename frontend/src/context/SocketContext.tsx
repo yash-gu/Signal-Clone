@@ -90,7 +90,12 @@ export function SocketProvider({ children }: { children: ReactNode }) {
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data.type === "new_message") {
-        setMessages((prev) => [...prev, data.message]);
+        if (data.message.conversation_id === activeConversation) {
+          setMessages((prev) => [...prev, data.message]);
+        }
+        
+        // Always trigger a refresh so the sidebar updates its last message preview
+        setRefreshConversationsTrigger(prev => prev + 1);
         
         if (data.message.sender_id !== user?.id) {
           ws.send(JSON.stringify({

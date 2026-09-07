@@ -11,7 +11,7 @@ router = APIRouter()
 async def get_conversations(current_user: dict = Depends(get_current_user), db: aiosqlite.Connection = Depends(get_db)):
     query = '''
         SELECT c.id, c.is_group, c.name, c.created_at,
-               (SELECT content FROM messages m WHERE m.conversation_id = c.id ORDER BY created_at DESC LIMIT 1) as last_message,
+               (SELECT CASE WHEN content != '' THEN content WHEN attachment_url IS NOT NULL THEN 'Photo' ELSE '' END FROM messages m WHERE m.conversation_id = c.id ORDER BY created_at DESC LIMIT 1) as last_message,
                (SELECT created_at FROM messages m WHERE m.conversation_id = c.id ORDER BY created_at DESC LIMIT 1) as last_message_time,
                (SELECT COUNT(*) FROM messages m WHERE m.conversation_id = c.id AND m.sender_id != ? AND m.status IN ('SENT', 'DELIVERED')) as unread_count
         FROM conversations c
