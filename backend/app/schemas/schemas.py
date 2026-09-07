@@ -8,7 +8,8 @@ class RegisterRequest(BaseModel):
     otp: str
 
 class LoginRequest(BaseModel):
-    phone_number: str
+    phone_number: Optional[str] = None
+    username: Optional[str] = None
     otp: str
 
 class TokenResponse(BaseModel):

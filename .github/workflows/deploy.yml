@@ -43,3 +43,5 @@ jobs:
             cd /mnt/storage/iex-dashboard-old
             # Ensure the deployment doesn't conflict by building and starting detached
             sudo docker compose up -d --build
+            # Restart Nginx to clear Docker internal DNS cache (prevents 502 Bad Gateway)
+            sudo docker compose restart nginx

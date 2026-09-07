@@ -29,10 +29,17 @@ async def login(req: LoginRequest, db: aiosqlite.Connection = Depends(get_db)):
     if req.otp != "1234":
         raise HTTPException(status_code=401, detail="Invalid OTP. Please use '1234'.")
         
-    async with db.execute("SELECT id FROM users WHERE phone_number = ?", (req.phone_number,)) as cursor:
-        user = await cursor.fetchone()
-        if not user:
-            raise HTTPException(status_code=404, detail="User not found")
-        
-        token = create_access_token(user['id'], req.phone_number)
-        return {"access_token": token, "token_type": "bearer"}
+    if req.username:
+        async with db.execute("SELECT id, phone_number FROM users WHERE username = ?", (req.username,)) as cursor:
+            user = await cursor.fetchone()
+    elif req.phone_number:
+        async with db.execute("SELECT id, phone_number FROM users WHERE phone_number = ?", (req.phone_number,)) as cursor:
+            user = await cursor.fetchone()
+    else:
+        raise HTTPException(status_code=400, detail="Must provide phone_number or username")
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    token = create_access_token(user['id'], user['phone_number'])
+    return {"access_token": token, "token_type": "bearer"}
