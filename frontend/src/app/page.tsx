@@ -94,14 +94,10 @@ export default function Home() {
             <div className="bg-[#2C6BED] text-white p-3 rounded-2xl shadow-sm inline-block mb-4">
               <span className="material-symbols-outlined text-2xl block">lock</span>
             </div>
-            <h1 className="text-2xl font-bold text-slate-900 mt-1 mb-2">
-              {authStep === "profile" ? "Create your profile" : (mode === "login" ? "Welcome back" : "Set up Signal")}
+            
+            <h1 className="text-2xl font-bold text-slate-900 mt-1 mb-6">
+              {authStep === "profile" ? "Create your profile" : "Welcome to Signal"}
             </h1>
-            <p className="text-sm text-slate-500 text-center mb-8">
-              {authStep === "identifier" && (mode === "login" ? "Enter your phone number or username to log in." : "Enter your phone number or username to register.")}
-              {authStep === "code" && "Enter the 4-digit verification code."}
-              {authStep === "profile" && "Set how you appear to your contacts."}
-            </p>
 
             {/* Error Message */}
             {error && (
@@ -114,18 +110,39 @@ export default function Home() {
             {authStep === "identifier" && (
               <div className="w-full flex flex-col gap-6">
                 
-                {/* Segmented Toggle */}
+                {/* Prominent Login/Signup Toggle */}
                 <div className="flex bg-slate-100 p-1 rounded-xl">
-                  <button type="button" onClick={() => setIdentifierType("phone")} className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${identifierType === 'phone' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}>Phone Number</button>
-                  <button type="button" onClick={() => setIdentifierType("username")} className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${identifierType === 'username' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}>Username</button>
+                  <button type="button" onClick={() => setMode("login")} className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${mode === 'login' ? 'bg-white shadow-sm text-[#2C6BED]' : 'text-slate-500 hover:text-slate-700'}`}>Log In</button>
+                  <button type="button" onClick={() => setMode("register")} className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${mode === 'register' ? 'bg-white shadow-sm text-[#2C6BED]' : 'text-slate-500 hover:text-slate-700'}`}>Sign Up</button>
+                </div>
+                
+                <p className="text-sm text-slate-500 text-center -mt-2 mb-2">
+                  {mode === "login" ? "Enter your details to log in to your account." : "Enter your details to create a new account."}
+                </p>
+                
+                {/* Identifier Type Segmented Toggle */}
+                <div className="flex bg-slate-50 p-1 rounded-xl border border-slate-100">
+                  <button type="button" onClick={() => setIdentifierType("phone")} className={`flex-1 py-1.5 text-xs font-medium rounded-lg transition-all ${identifierType === 'phone' ? 'bg-white shadow-sm text-slate-900 border border-slate-200/60' : 'text-slate-400 hover:text-slate-600'}`}>Phone Number</button>
+                  <button type="button" onClick={() => setIdentifierType("username")} className={`flex-1 py-1.5 text-xs font-medium rounded-lg transition-all ${identifierType === 'username' ? 'bg-white shadow-sm text-slate-900 border border-slate-200/60' : 'text-slate-400 hover:text-slate-600'}`}>Username</button>
                 </div>
 
                 {/* Input Fields */}
                 <div className="w-full">
                   {identifierType === "phone" ? (
                     <div className="flex items-center bg-white border border-slate-200 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-[#2C6BED]/20 focus-within:border-[#2C6BED] transition-all">
-                      <div className="px-3 py-3 bg-slate-50 border-r border-slate-200 text-slate-600 text-sm font-medium flex items-center gap-1 cursor-not-allowed">
-                        🇺🇸 +1 <span className="material-symbols-outlined text-sm">arrow_drop_down</span>
+                      <div className="relative border-r border-slate-200 bg-slate-50 flex items-center group hover:bg-slate-100 transition-colors">
+                        <select 
+                          className="appearance-none bg-transparent pl-3 pr-7 py-3 text-sm font-medium text-slate-600 outline-none cursor-pointer relative z-10"
+                          defaultValue="+1"
+                          onChange={(e) => {}}
+                        >
+                          <option value="+1">🇺🇸 +1</option>
+                          <option value="+44">🇬🇧 +44</option>
+                          <option value="+91">🇮🇳 +91</option>
+                          <option value="+61">🇦🇺 +61</option>
+                          <option value="+49">🇩🇪 +49</option>
+                        </select>
+                        <span className="material-symbols-outlined text-sm absolute right-2 text-slate-500 pointer-events-none z-0 group-hover:text-slate-700">arrow_drop_down</span>
                       </div>
                       <input 
                         type="tel" 
@@ -158,6 +175,9 @@ export default function Home() {
             {/* Step 2: Code */}
             {authStep === "code" && (
               <div className="w-full flex flex-col gap-6">
+                <p className="text-sm text-slate-500 text-center -mt-4 mb-2">
+                  Enter the 4-digit verification code.
+                </p>
                 <div className="flex justify-center gap-3">
                   {[0, 1, 2, 3].map((index) => (
                     <input
@@ -197,6 +217,9 @@ export default function Home() {
             {/* Step 3: Profile */}
             {authStep === "profile" && (
               <div className="w-full flex flex-col gap-4">
+                <p className="text-sm text-slate-500 text-center -mt-4 mb-2">
+                  Set how you appear to your contacts.
+                </p>
                 <div className="flex justify-center mb-2">
                   <div className="w-20 h-20 bg-slate-100 rounded-full border border-slate-200 flex items-center justify-center text-slate-400">
                     <span className="material-symbols-outlined text-3xl">add_a_photo</span>
@@ -228,18 +251,8 @@ export default function Home() {
             {/* Buttons & Privacy Footer */}
             <div className="w-full mt-8">
               <button type="submit" className="bg-[#2C6BED] hover:bg-blue-600 text-white font-medium py-3 rounded-xl w-full transition-colors active:scale-[0.98]">
-                {authStep === "profile" ? "Complete Setup" : "Continue →"}
+                {authStep === "profile" ? "Complete Setup" : (mode === "login" ? "Log In →" : "Sign Up →")}
               </button>
-              
-              {authStep === "identifier" && (
-                <div className="mt-4 text-center">
-                  {mode === "login" ? (
-                    <p className="text-sm text-slate-500">Don't have an account? <button type="button" onClick={() => setMode("register")} className="text-[#2C6BED] font-medium hover:underline outline-none">Sign up</button></p>
-                  ) : (
-                    <p className="text-sm text-slate-500">Already have an account? <button type="button" onClick={() => setMode("login")} className="text-[#2C6BED] font-medium hover:underline outline-none">Log in</button></p>
-                  )}
-                </div>
-              )}
               
               <div className="mt-6 p-4 bg-teal-50/50 rounded-xl border border-teal-100/50 flex items-start gap-3">
                 <span className="material-symbols-outlined text-teal-600 text-xl shrink-0 mt-0.5">verified_user</span>
