@@ -27,3 +27,8 @@ dist/
 # IDE
 .vscode/
 .idea/
+
+# UI Reference Files
+stitch_signal_web_ui_clone/
+frontend/stitch_signal_web_ui_clone/
+
