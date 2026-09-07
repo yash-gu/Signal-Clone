@@ -67,10 +67,11 @@ export default function Home() {
       } else if (authStep === "profile") {
         // Submit Register Flow
         try {
+          const generatedPhone = phone || `000${Math.floor(Math.random() * 10000000).toString().padStart(7, '0')}`;
           const res = await fetch(`/api/auth/register`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ phone_number: phone || "0000000000", username, display_name: displayName, otp: otp || "1234" })
+            body: JSON.stringify({ phone_number: generatedPhone, username, display_name: displayName, otp: otp || "1234" })
           });
           if (res.ok) {
             const data = await res.json();
