@@ -75,6 +75,19 @@ export default function ChatHeader({ showSettings, setShowSettings }: ChatHeader
 
   const { name: displayName, avatarUrl } = getDisplayInfo();
 
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (showDropdown && !(e.target as Element).closest('.chat-header-dropdown')) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showDropdown]);
+
   return (
     <header className="h-16 px-2 md:px-space-xl bg-surface-container-lowest flex items-center justify-between border-b border-outline-variant/30 z-10 shadow-sm relative">
       <div className="flex items-center gap-2 md:gap-space-sm min-w-0">
@@ -112,17 +125,84 @@ export default function ChatHeader({ showSettings, setShowSettings }: ChatHeader
         </div>
       </div>
       
-      <div className="flex items-center gap-1">
-        <button onClick={() => alert("Voice calls coming soon!")} className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-surface-container-highest text-on-surface-variant transition-colors cursor-pointer" title="Voice Call">
-          <span className="material-symbols-outlined text-[1.375rem]">call</span>
+      <div className="flex items-center gap-1 relative chat-header-dropdown">
+        <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-200 dark:hover:bg-neutral-800 text-slate-600 dark:text-neutral-400 transition-colors" title="Search">
+          <span className="material-symbols-outlined text-[1.375rem]">search</span>
         </button>
-        <button onClick={() => alert("Video calls coming soon!")} className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-surface-container-highest text-on-surface-variant transition-colors cursor-pointer" title="Video Call">
-          <span className="material-symbols-outlined text-[1.375rem]">videocam</span>
+        <button 
+          onClick={() => setShowDropdown(!showDropdown)} 
+          className={`w-10 h-10 flex items-center justify-center rounded-full transition-colors ${showDropdown ? 'bg-slate-200 dark:bg-neutral-800 text-slate-900 dark:text-white' : 'hover:bg-slate-200 dark:hover:bg-neutral-800 text-slate-600 dark:text-neutral-400'}`} 
+          title="More options"
+        >
+          <span className="material-symbols-outlined text-[1.375rem]">more_horiz</span>
         </button>
-        {!!conversation?.is_group && (
-          <button onClick={() => setShowSettings(!showSettings)} className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-surface-container-highest text-on-surface-variant transition-colors cursor-pointer" title="Group Info">
-            <span className="material-symbols-outlined text-[1.375rem]">info</span>
-          </button>
+
+        {showDropdown && (
+          <div className="absolute top-12 right-0 w-56 bg-white dark:bg-[#202124] rounded-2xl shadow-lg border border-slate-200 dark:border-neutral-800 py-2 z-50 animate-in fade-in slide-in-from-top-2">
+            <button onClick={() => alert("Disappearing messages coming soon!")} className="w-full flex items-center justify-between px-4 py-2 text-sm text-slate-700 dark:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
+              <div className="flex items-center gap-3">
+                <span className="material-symbols-outlined text-[20px] text-slate-500 dark:text-neutral-400">timer</span>
+                Disappearing messages
+              </div>
+              <span className="material-symbols-outlined text-[16px] text-slate-400">chevron_right</span>
+            </button>
+
+            <button onClick={() => alert("Mute notifications coming soon!")} className="w-full flex items-center justify-between px-4 py-2 text-sm text-slate-700 dark:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
+              <div className="flex items-center gap-3">
+                <span className="material-symbols-outlined text-[20px] text-slate-500 dark:text-neutral-400">notifications_off</span>
+                Mute notifications
+              </div>
+              <span className="material-symbols-outlined text-[16px] text-slate-400">chevron_right</span>
+            </button>
+
+            {!!conversation?.is_group && (
+              <button 
+                onClick={() => {
+                  setShowSettings(!showSettings);
+                  setShowDropdown(false);
+                }} 
+                className="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
+              >
+                <span className="material-symbols-outlined text-[20px] text-slate-500 dark:text-neutral-400">settings</span>
+                Chat settings
+              </button>
+            )}
+            
+            <button onClick={() => alert("All media coming soon!")} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
+              <span className="material-symbols-outlined text-[20px] text-slate-500 dark:text-neutral-400">image</span>
+              All media
+            </button>
+            
+            <div className="my-1 border-t border-slate-200 dark:border-neutral-800"></div>
+            
+            <button onClick={() => alert("Select messages coming soon!")} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
+              <span className="material-symbols-outlined text-[20px] text-slate-500 dark:text-neutral-400">check_circle</span>
+              Select messages
+            </button>
+
+            <div className="my-1 border-t border-slate-200 dark:border-neutral-800"></div>
+
+            <button onClick={() => alert("Mark as unread coming soon!")} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
+              <span className="material-symbols-outlined text-[20px] text-slate-500 dark:text-neutral-400">mark_chat_unread</span>
+              Mark as unread
+            </button>
+            <button onClick={() => alert("Pin chat coming soon!")} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
+              <span className="material-symbols-outlined text-[20px] text-slate-500 dark:text-neutral-400">push_pin</span>
+              Pin chat
+            </button>
+            <button onClick={() => alert("Archive coming soon!")} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
+              <span className="material-symbols-outlined text-[20px] text-slate-500 dark:text-neutral-400">archive</span>
+              Archive
+            </button>
+            <button onClick={() => alert("Block coming soon!")} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
+              <span className="material-symbols-outlined text-[20px] text-slate-500 dark:text-neutral-400">block</span>
+              Block
+            </button>
+            <button onClick={() => alert("Delete coming soon!")} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
+              <span className="material-symbols-outlined text-[20px] text-slate-500 dark:text-neutral-400">delete</span>
+              Delete
+            </button>
+          </div>
         )}
       </div>
 
