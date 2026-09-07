@@ -1,7 +1,9 @@
+import os
 import aiosqlite
 from app.core.config import settings
 
 async def init_db():
+    os.makedirs(os.path.dirname(settings.DATABASE_URL) or ".", exist_ok=True)
     async with aiosqlite.connect(settings.DATABASE_URL) as db:
         await db.execute('''
             CREATE TABLE IF NOT EXISTS users (
