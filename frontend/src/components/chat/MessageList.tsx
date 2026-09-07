@@ -26,10 +26,7 @@ export default function MessageList() {
         <MessageBubble 
           key={msg.id}
           isOutgoing={msg.sender_id === user?.id}
-          content={msg.content}
-          timestamp={new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-          status={msg.status}
-          senderName={msg.sender_name}
+          msg={msg}
         />
       ))}
       

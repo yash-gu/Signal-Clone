@@ -10,13 +10,13 @@ interface GroupSettingsPanelProps {
 
 export default function GroupSettingsPanel({ conversationId, onClose }: GroupSettingsPanelProps) {
   const { token, user } = useAuth();
+  const { expiresIn, setExpiresIn } = useSocket();
   const [participants, setParticipants] = useState<any[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
   
   // For adding members
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
     fetchParticipants();
@@ -97,13 +97,34 @@ export default function GroupSettingsPanel({ conversationId, onClose }: GroupSet
   return (
     <div className="w-80 border-l border-slate-200 dark:border-neutral-800 bg-white dark:bg-[#202124] flex flex-col h-full flex-shrink-0 shadow-xl">
       <div className="h-16 border-b border-slate-100 dark:border-neutral-800 flex items-center justify-between px-4 flex-shrink-0">
-        <h3 className="font-semibold text-lg text-slate-900 dark:text-white">Group Settings</h3>
+        <h3 className="font-semibold text-lg text-slate-900 dark:text-white">Settings</h3>
         <button onClick={onClose} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-100 dark:hover:bg-[#2e2f33] text-slate-500 transition-colors">
           <span className="material-symbols-outlined text-sm">close</span>
         </button>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4">
+        
+        {/* Disappearing Messages */}
+        <div className="mb-6 bg-slate-50 dark:bg-[#18181b] p-3 rounded-xl border border-slate-200 dark:border-neutral-800">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="material-symbols-outlined text-slate-500 text-lg">timer</span>
+            <h4 className="text-sm font-semibold text-slate-900 dark:text-white">Disappearing Messages</h4>
+          </div>
+          <p className="text-xs text-slate-500 mb-3">Anyone can change this timer. Messages sent will disappear after they are created.</p>
+          <select 
+            value={expiresIn || ""} 
+            onChange={(e) => setExpiresIn(e.target.value ? parseInt(e.target.value) : null)}
+            className="w-full bg-white dark:bg-[#202124] border border-slate-200 dark:border-neutral-800 text-sm p-2 rounded-lg outline-none focus:ring-2 focus:ring-[#2C6BED]/50"
+          >
+            <option value="">Off</option>
+            <option value="10">10 seconds</option>
+            <option value="60">1 minute</option>
+            <option value="3600">1 hour</option>
+            <option value="86400">1 day</option>
+          </select>
+        </div>
+
         {isAdmin && (
           <div className="mb-6">
             <h4 className="text-xs font-semibold text-slate-500 dark:text-neutral-400 uppercase tracking-wider mb-2">Add Members</h4>

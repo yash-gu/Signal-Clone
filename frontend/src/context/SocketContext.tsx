@@ -1,6 +1,12 @@
 "use client";
 import React, { createContext, useContext, useEffect, useRef, useState, ReactNode } from "react";
 import { useAuth } from "./AuthContext";
+import { useToast } from "./ToastContext";
+
+export interface MessageReaction {
+  user_id: number;
+  emoji: string;
+}
 
 export interface Message {
   id: number;
@@ -10,15 +16,25 @@ export interface Message {
   status: "SENT" | "DELIVERED" | "READ";
   created_at: string;
   sender_name?: string;
+  attachment_url?: string;
+  reply_to_id?: number;
+  expires_at?: string;
+  reactions?: MessageReaction[];
 }
 
 interface SocketContextType {
   messages: Message[];
   activeConversation: number | null;
   setActiveConversation: (id: number | null) => void;
-  sendMessage: (content: string) => void;
+  sendMessage: (content: string, attachment_url?: string, reply_to_id?: number, expires_in?: number) => void;
   sendTyping: () => void;
   typingUser: number | null;
+  addReaction: (message_id: number, emoji: string) => void;
+  removeReaction: (message_id: number) => void;
+  replyingTo: Message | null;
+  setReplyingTo: (msg: Message | null) => void;
+  expiresIn: number | null;
+  setExpiresIn: (seconds: number | null) => void;
 }
 
 const SocketContext = createContext<SocketContextType | undefined>(undefined);
@@ -29,19 +45,21 @@ export function SocketProvider({ children }: { children: ReactNode }) {
   const [activeConversation, setActiveConversation] = useState<number | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [typingUser, setTypingUser] = useState<number | null>(null);
+  const [replyingTo, setReplyingTo] = useState<Message | null>(null);
+  const [expiresIn, setExpiresIn] = useState<number | null>(null);
   const socketRef = useRef<WebSocket | null>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Re-fetch messages when active conversation changes
   useEffect(() => {
     if (activeConversation && token) {
+      setReplyingTo(null); // Reset reply state
       fetch(`/api/messages/${activeConversation}`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       .then(res => res.json())
       .then(data => {
         setMessages(Array.isArray(data) ? data : []);
-        // Automatically send a read receipt when we open a conversation
         if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
           socketRef.current.send(JSON.stringify({
             action: "messages_read",
@@ -52,6 +70,7 @@ export function SocketProvider({ children }: { children: ReactNode }) {
       .catch(console.error);
     } else {
       setMessages([]);
+      setReplyingTo(null);
     }
   }, [activeConversation, token]);
 
@@ -66,7 +85,6 @@ export function SocketProvider({ children }: { children: ReactNode }) {
       if (data.type === "new_message") {
         setMessages((prev) => [...prev, data.message]);
         
-        // If we received a message from someone else, mark it as delivered
         if (data.message.sender_id !== user?.id) {
           ws.send(JSON.stringify({
             action: "message_delivered",
@@ -74,23 +92,23 @@ export function SocketProvider({ children }: { children: ReactNode }) {
             conversation_id: data.message.conversation_id
           }));
           
-          // If we are actively looking at this conversation, mark as read
           if (activeConversation === data.message.conversation_id) {
             ws.send(JSON.stringify({
               action: "messages_read",
               conversation_id: data.message.conversation_id
             }));
+          } else {
+            // Toast for incoming message in other chat
+            showToast(data.message.content || "Sent an attachment", "info", `New Message`);
           }
         }
       } else if (data.type === "message_status_update") {
-        // Update the status of a specific message
         if (data.conversation_id === activeConversation) {
           setMessages(prev => prev.map(msg => 
             msg.id === data.message_id ? { ...msg, status: data.status } : msg
           ));
         }
       } else if (data.type === "conversation_read") {
-        // Mark all outgoing messages in this conversation as READ
         if (data.conversation_id === activeConversation) {
           setMessages(prev => prev.map(msg => 
             (msg.sender_id === user?.id && (msg.status === "SENT" || msg.status === "DELIVERED")) 
@@ -104,20 +122,43 @@ export function SocketProvider({ children }: { children: ReactNode }) {
           if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
           typingTimeoutRef.current = setTimeout(() => setTypingUser(null), 3000);
         }
+      } else if (data.type === "reaction_update") {
+        if (data.conversation_id === activeConversation) {
+          setMessages(prev => prev.map(msg => {
+            if (msg.id === data.message_id) {
+              const currentReactions = msg.reactions || [];
+              if (data.action === "add") {
+                const existingIndex = currentReactions.findIndex(r => r.user_id === data.user_id);
+                if (existingIndex > -1) {
+                  currentReactions[existingIndex].emoji = data.emoji;
+                  return { ...msg, reactions: [...currentReactions] };
+                } else {
+                  return { ...msg, reactions: [...currentReactions, { user_id: data.user_id, emoji: data.emoji }] };
+                }
+              } else if (data.action === "remove") {
+                return { ...msg, reactions: currentReactions.filter(r => r.user_id !== data.user_id) };
+              }
+            }
+            return msg;
+          }));
+        }
       }
     };
 
     return () => {
       ws.close();
     };
-  }, [token, activeConversation]);
+  }, [token, activeConversation, user, showToast]);
 
-  const sendMessage = (content: string) => {
+  const sendMessage = (content: string, attachment_url?: string, reply_to_id?: number, expires_in?: number) => {
     if (socketRef.current && activeConversation) {
       socketRef.current.send(JSON.stringify({
         action: "send_message",
         conversation_id: activeConversation,
-        content
+        content,
+        attachment_url,
+        reply_to_id,
+        expires_in
       }));
     }
   };
@@ -130,6 +171,27 @@ export function SocketProvider({ children }: { children: ReactNode }) {
       }));
     }
   };
+  
+  const addReaction = (message_id: number, emoji: string) => {
+    if (socketRef.current && activeConversation) {
+      socketRef.current.send(JSON.stringify({
+        action: "add_reaction",
+        conversation_id: activeConversation,
+        message_id,
+        emoji
+      }));
+    }
+  };
+
+  const removeReaction = (message_id: number) => {
+    if (socketRef.current && activeConversation) {
+      socketRef.current.send(JSON.stringify({
+        action: "remove_reaction",
+        conversation_id: activeConversation,
+        message_id
+      }));
+    }
+  };
 
   return (
     <SocketContext.Provider value={{
@@ -138,7 +200,13 @@ export function SocketProvider({ children }: { children: ReactNode }) {
       setActiveConversation,
       sendMessage,
       sendTyping,
-      typingUser
+      typingUser,
+      addReaction,
+      removeReaction,
+      replyingTo,
+      setReplyingTo,
+      expiresIn,
+      setExpiresIn
     }}>
       {children}
     </SocketContext.Provider>

@@ -53,10 +53,42 @@ async def init_db():
                 content TEXT NOT NULL,
                 status TEXT DEFAULT 'SENT',
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                attachment_url TEXT,
+                reply_to_id INTEGER,
+                expires_at TIMESTAMP,
                 FOREIGN KEY (conversation_id) REFERENCES conversations (id),
-                FOREIGN KEY (sender_id) REFERENCES users (id)
+                FOREIGN KEY (sender_id) REFERENCES users (id),
+                FOREIGN KEY (reply_to_id) REFERENCES messages (id)
             )
         ''')
+        
+        await db.execute('''
+            CREATE TABLE IF NOT EXISTS message_reactions (
+                message_id INTEGER,
+                user_id INTEGER,
+                emoji TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (message_id, user_id),
+                FOREIGN KEY (message_id) REFERENCES messages (id),
+                FOREIGN KEY (user_id) REFERENCES users (id)
+            )
+        ''')
+        await db.commit()
+
+        # Safely add columns to existing messages table (if migrating from old version)
+        try:
+            await db.execute("ALTER TABLE messages ADD COLUMN attachment_url TEXT")
+        except aiosqlite.OperationalError:
+            pass
+        try:
+            await db.execute("ALTER TABLE messages ADD COLUMN reply_to_id INTEGER REFERENCES messages(id)")
+        except aiosqlite.OperationalError:
+            pass
+        try:
+            await db.execute("ALTER TABLE messages ADD COLUMN expires_at TIMESTAMP")
+        except aiosqlite.OperationalError:
+            pass
+        
         await db.commit()
 
 async def get_db():
