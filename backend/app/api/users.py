@@ -28,3 +28,13 @@ async def search_users(q: str, current_user: dict = Depends(get_current_user), d
         rows = await cursor.fetchall()
         return [dict(row) for row in rows]
 
+from app.core.ws_manager import manager
+
+@router.get("/{user_id}/status")
+async def get_user_status(user_id: int, db: aiosqlite.Connection = Depends(get_db)):
+    is_online = user_id in manager.active_connections
+    async with db.execute("SELECT last_seen FROM users WHERE id = ?", (user_id,)) as cursor:
+        row = await cursor.fetchone()
+        last_seen = row["last_seen"] if row else None
+    return {"is_online": is_online, "last_seen": last_seen}
+

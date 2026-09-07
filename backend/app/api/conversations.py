@@ -4,6 +4,7 @@ from app.schemas.schemas import ConversationResponse
 from app.core.security import get_current_user
 from app.db.database import get_db
 import aiosqlite
+from app.core.ws_manager import manager
 
 router = APIRouter()
 
@@ -27,7 +28,7 @@ async def get_conversations(current_user: dict = Depends(get_current_user), db: 
         for row in rows:
             conv = dict(row)
             async with db.execute('''
-                SELECT p.user_id, u.id, p.is_admin, u.username, u.display_name, u.phone_number 
+                SELECT p.user_id, u.id, p.is_admin, u.username, u.display_name, u.phone_number, u.avatar_url
                 FROM participants p
                 JOIN users u ON p.user_id = u.id
                 WHERE p.conversation_id = ?
@@ -103,6 +104,12 @@ async def add_participant(conv_id: int, req: AddParticipantRequest, current_user
     try:
         await db.execute("INSERT INTO participants (conversation_id, user_id, is_admin) VALUES (?, ?, FALSE)", (conv_id, req.user_id))
         await db.commit()
+        
+        async with db.execute("SELECT user_id FROM participants WHERE conversation_id = ?", (conv_id,)) as cursor:
+            participants = await cursor.fetchall()
+            for p in participants:
+                await manager.send_personal_message({"type": "group_updated", "conversation_id": conv_id}, p["user_id"])
+                
     except aiosqlite.IntegrityError:
         pass # Already a participant
     return {"status": "ok"}
@@ -118,4 +125,12 @@ async def remove_participant(conv_id: int, user_id: int, current_user: dict = De
                 
     await db.execute("DELETE FROM participants WHERE conversation_id = ? AND user_id = ?", (conv_id, user_id))
     await db.commit()
+    
+    async with db.execute("SELECT user_id FROM participants WHERE conversation_id = ?", (conv_id,)) as cursor:
+        participants = await cursor.fetchall()
+        for p in participants:
+            await manager.send_personal_message({"type": "group_updated", "conversation_id": conv_id}, p["user_id"])
+            
+    await manager.send_personal_message({"type": "group_updated", "conversation_id": conv_id}, user_id)
+            
     return {"status": "ok"}

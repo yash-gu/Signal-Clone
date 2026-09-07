@@ -108,6 +108,7 @@ export default function ComposeModal({ onClose }: ComposeModalProps) {
         });
         if (res.ok) {
           const data = await res.json();
+          refreshConversations();
           setActiveConversation(data.conversation_id);
           onClose();
         } else {
@@ -276,8 +277,12 @@ export default function ComposeModal({ onClose }: ComposeModalProps) {
                     onClick={() => toggleContact(user)}
                     className="flex items-center gap-3 p-2 rounded-xl cursor-pointer hover:bg-slate-50 dark:hover:bg-[#2e2f33] transition-colors"
                   >
-                    <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-[#18181b] flex items-center justify-center text-slate-600 dark:text-neutral-400 font-bold">
-                      {user.display_name.charAt(0).toUpperCase()}
+                    <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-[#18181b] flex items-center justify-center text-slate-600 dark:text-neutral-400 font-bold overflow-hidden">
+                      {user.avatar_url ? (
+                        <img src={user.avatar_url} alt={user.display_name} className="w-full h-full object-cover" />
+                      ) : (
+                        user.display_name.charAt(0).toUpperCase()
+                      )}
                     </div>
                     <div className="flex flex-col flex-1">
                       <span className="text-slate-900 dark:text-white font-medium">{user.display_name}</span>

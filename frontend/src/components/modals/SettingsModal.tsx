@@ -94,16 +94,6 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
                   </div>
                 </div>
                 
-                <div className="pt-6 border-t border-slate-100 dark:border-neutral-800">
-                  <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4 uppercase tracking-wider">Danger Zone</h3>
-                  <button 
-                    onClick={() => { logout(); onClose(); }}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-medium rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
-                  >
-                    <span className="material-symbols-outlined text-[18px]">logout</span>
-                    Log out
-                  </button>
-                </div>
               </div>
             )}
 

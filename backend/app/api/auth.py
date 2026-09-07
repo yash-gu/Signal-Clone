@@ -14,6 +14,23 @@ class CheckUserRequest(BaseModel):
     phone_number: str = None
     username: str = None
 
+import os
+import uuid
+from fastapi import UploadFile, File
+
+@router.post("/upload_avatar")
+async def upload_avatar(file: UploadFile = File(...)):
+    os.makedirs("data/uploads", exist_ok=True)
+    ext = file.filename.split(".")[-1] if "." in file.filename else ""
+    filename = f"avatar_{uuid.uuid4().hex}.{ext}"
+    file_path = os.path.join("data/uploads", filename)
+    
+    with open(file_path, "wb") as f:
+        content = await file.read()
+        f.write(content)
+        
+    return {"url": f"/uploads/{filename}"}
+
 @router.post("/check")
 async def check_user(req: CheckUserRequest, db: aiosqlite.Connection = Depends(get_db)):
     if req.username:
@@ -34,8 +51,8 @@ async def register(req: RegisterRequest, db: aiosqlite.Connection = Depends(get_
         raise HTTPException(status_code=400, detail="Username can only contain letters, numbers, and underscores (no spaces).")
     try:
         await db.execute(
-            "INSERT INTO users (phone_number, username, display_name) VALUES (?, ?, ?)",
-            (req.phone_number, req.username, req.display_name)
+            "INSERT INTO users (phone_number, username, display_name, avatar_url) VALUES (?, ?, ?, ?)",
+            (req.phone_number, req.username, req.display_name, req.avatar_url)
         )
         await db.commit()
         

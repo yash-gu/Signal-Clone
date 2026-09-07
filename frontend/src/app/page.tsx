@@ -16,6 +16,8 @@ export default function Home() {
   const [username, setUsername] = useState("");
   const [otp, setOtp] = useState("1234");
   const [displayName, setDisplayName] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   if (!token) {
@@ -100,7 +102,7 @@ export default function Home() {
           const res = await fetch(`/api/auth/register`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ phone_number: generatedPhone, username, display_name: displayName, otp: otp || "1234" })
+            body: JSON.stringify({ phone_number: generatedPhone, username, display_name: displayName, otp: otp || "1234", avatar_url: avatarUrl })
           });
           if (res.ok) {
             const data = await res.json();
@@ -226,9 +228,40 @@ export default function Home() {
             {authStep === "profile" && (
               <div className="w-full flex flex-col gap-4">
                 <div className="flex justify-center mb-2">
-                  <div className="w-20 h-20 bg-slate-100 dark:bg-[#121214] rounded-full border border-slate-200 dark:border-neutral-800 flex items-center justify-center text-slate-400 dark:text-neutral-500">
-                    <span className="material-symbols-outlined text-3xl">add_a_photo</span>
-                  </div>
+                  <label className="relative w-20 h-20 bg-slate-100 dark:bg-[#121214] rounded-full border border-slate-200 dark:border-neutral-800 flex items-center justify-center text-slate-400 dark:text-neutral-500 cursor-pointer overflow-hidden group hover:opacity-80 transition-opacity">
+                    {isUploading ? (
+                      <span className="material-symbols-outlined text-2xl animate-spin">refresh</span>
+                    ) : avatarUrl ? (
+                      <img src={avatarUrl} alt="Avatar Preview" className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="material-symbols-outlined text-3xl">add_a_photo</span>
+                    )}
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      className="hidden" 
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        setIsUploading(true);
+                        const formData = new FormData();
+                        formData.append("file", file);
+                        try {
+                          const res = await fetch("/api/auth/upload_avatar", { method: "POST", body: formData });
+                          if (res.ok) {
+                            const data = await res.json();
+                            setAvatarUrl(data.url);
+                          } else {
+                            setError("Upload failed");
+                          }
+                        } catch(err) {
+                          setError("Failed to upload image");
+                        } finally {
+                          setIsUploading(false);
+                        }
+                      }} 
+                    />
+                  </label>
                 </div>
                 
                 <input 

@@ -130,10 +130,12 @@ export default function ConversationList() {
               <h3 className="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider mb-2 pl-2 mt-2">Contacts</h3>
               {filteredConvs.map(conv => {
                 let displayName = conv.name || "Unknown Conversation";
+                let avatarUrl: string | null = null;
                 if (!conv.is_group && conv.participants) {
                   const otherUser = conv.participants.find((p: any) => p.user_id !== user?.id);
                   if (otherUser && otherUser.user) {
                     displayName = otherUser.user.display_name || otherUser.user.username;
+                    avatarUrl = otherUser.user.avatar_url;
                   }
                 }
                 return (
@@ -148,6 +150,8 @@ export default function ConversationList() {
                     <div className="w-10 h-10 rounded-full bg-surface-container-high text-primary flex items-center justify-center font-headline-sm overflow-hidden">
                       {conv.is_group ? (
                         <span className="material-symbols-outlined text-[20px]">hub</span>
+                      ) : avatarUrl ? (
+                        <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover" />
                       ) : (
                         displayName.charAt(0).toUpperCase()
                       )}
@@ -173,11 +177,13 @@ export default function ConversationList() {
           return displayedConversations.map(conv => {
           const isActive = conv.id === activeConversation;
           let displayName = conv.name || "Unknown Conversation";
+          let avatarUrl: string | null = null;
           
           if (!conv.is_group && conv.participants) {
             const otherUser = conv.participants.find((p: any) => p.user_id !== user?.id);
             if (otherUser && otherUser.user) {
               displayName = otherUser.user.display_name || otherUser.user.username;
+              avatarUrl = otherUser.user.avatar_url;
             }
           }
 
@@ -192,6 +198,8 @@ export default function ConversationList() {
                 <div className="w-full h-full rounded-full bg-slate-200 dark:bg-[#383a3f] text-slate-700 dark:text-neutral-200 flex items-center justify-center shadow-sm overflow-hidden">
                    {conv.is_group ? (
                      <span className="material-symbols-outlined text-[20px]">hub</span>
+                   ) : avatarUrl ? (
+                     <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover" />
                    ) : (
                      <span className="font-semibold text-lg flex items-center justify-center">
                        {displayName.charAt(0).toUpperCase()}

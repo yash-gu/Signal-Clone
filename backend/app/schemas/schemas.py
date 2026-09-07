@@ -6,6 +6,7 @@ class RegisterRequest(BaseModel):
     username: str
     display_name: str
     otp: str
+    avatar_url: Optional[str] = None
 
 class LoginRequest(BaseModel):
     phone_number: Optional[str] = None

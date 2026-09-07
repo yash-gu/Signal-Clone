@@ -94,6 +94,14 @@ export function SocketProvider({ children }: { children: ReactNode }) {
     setRefreshConversationsTrigger(prev => prev + 1);
   };
 
+  useEffect(() => {
+    if (!token) {
+      setActiveConversation(null);
+      setMessages([]);
+      setReplyingTo(null);
+    }
+  }, [token]);
+
   // Re-fetch messages when active conversation changes
   useEffect(() => {
     if (activeConversation && token) {
@@ -171,6 +179,13 @@ export function SocketProvider({ children }: { children: ReactNode }) {
           if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
           typingTimeoutRef.current = setTimeout(() => setTypingUser(null), 3000);
         }
+      } else if (data.type === "group_updated") {
+        setRefreshConversationsTrigger(prev => prev + 1);
+        
+        // If we are currently viewing this conversation, we should also trigger something.
+        // Actually, setRefreshConversationsTrigger will cause ConversationList to update.
+        // If we were removed, ConversationList will fetch and might not find it, and we might need to clear activeConversation.
+        // We'll let ConversationList or a higher level component handle clearing activeConversation if it's no longer valid.
       } else if (data.type === "reaction_update") {
         if (data.conversation_id === activeConversation) {
           setMessages(prev => prev.map(msg => {

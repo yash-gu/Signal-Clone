@@ -30,6 +30,12 @@ export default function LeftRail() {
         <button onClick={() => setShowSettings(true)} className="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 hover:bg-slate-200 dark:text-neutral-400 dark:hover:text-neutral-200 dark:hover:bg-neutral-800 transition-all cursor-pointer" title="Settings">
           <span className="material-symbols-outlined text-[20px]">settings</span>
         </button>
+        <button onClick={() => {
+          localStorage.removeItem("token");
+          window.location.reload();
+        }} className="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 hover:bg-slate-200 dark:text-neutral-400 dark:hover:text-neutral-200 dark:hover:bg-neutral-800 transition-all cursor-pointer hover:text-red-600 dark:hover:text-red-400" title="Log Out">
+          <span className="material-symbols-outlined text-[20px]">logout</span>
+        </button>
       </div>
 
       {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}

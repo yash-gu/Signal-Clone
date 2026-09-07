@@ -188,9 +188,15 @@ async def websocket_endpoint(websocket: WebSocket, token: str = Query(...)):
                             
     except WebSocketDisconnect:
         manager.disconnect(websocket, user_id)
+        if user_id not in manager.active_connections:
+            await db.execute("UPDATE users SET last_seen = CURRENT_TIMESTAMP WHERE id = ?", (user_id,))
+            await db.commit()
         await db.close()
     except Exception as e:
         manager.disconnect(websocket, user_id)
+        if user_id not in manager.active_connections:
+            await db.execute("UPDATE users SET last_seen = CURRENT_TIMESTAMP WHERE id = ?", (user_id,))
+            await db.commit()
         await db.close()
 
 
