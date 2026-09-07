@@ -1,7 +1,10 @@
-"use client";
+import { useState } from "react";
 import ThemeToggle from "@/components/ui/ThemeToggle";
+import SettingsModal from "@/components/modals/SettingsModal";
 
 export default function LeftRail() {
+  const [showSettings, setShowSettings] = useState(false);
+
   return (
     <aside className="w-14 shrink-0 flex flex-col justify-between items-center py-4 bg-slate-100 dark:bg-[#18181b] border-r border-slate-200 dark:border-neutral-800 z-40 h-full">
       <nav className="w-full flex flex-col items-center gap-2 mt-2">
@@ -24,10 +27,12 @@ export default function LeftRail() {
 
       <div className="flex flex-col items-center gap-2 mb-2">
         <ThemeToggle />
-        <button className="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 hover:bg-slate-200 dark:text-neutral-400 dark:hover:text-neutral-200 dark:hover:bg-neutral-800 transition-all cursor-pointer" onClick={() => alert("Settings coming soon!")} title="Settings">
+        <button onClick={() => setShowSettings(true)} className="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 hover:bg-slate-200 dark:text-neutral-400 dark:hover:text-neutral-200 dark:hover:bg-neutral-800 transition-all cursor-pointer" title="Settings">
           <span className="material-symbols-outlined text-[20px]">settings</span>
         </button>
       </div>
+
+      {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
     </aside>
   );
 }

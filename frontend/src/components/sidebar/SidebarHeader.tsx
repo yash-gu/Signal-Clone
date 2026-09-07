@@ -1,9 +1,9 @@
 "use client";
 import { useState } from "react";
-import CreateGroupModal from "@/components/modals/CreateGroupModal";
+import ComposeModal from "@/components/modals/ComposeModal";
 
 export default function SidebarHeader() {
-  const [showGroupModal, setShowGroupModal] = useState(false);
+  const [showComposeModal, setShowComposeModal] = useState(false);
   
   return (
     <header className="px-4 py-3 h-14 flex items-center justify-between z-20">
@@ -18,7 +18,7 @@ export default function SidebarHeader() {
       </div>
 
       <div className="flex items-center gap-2 text-slate-500 dark:text-neutral-400">
-        <button onClick={() => setShowGroupModal(true)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-[#2a2b2e] hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer" title="New Message">
+        <button onClick={() => setShowComposeModal(true)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-[#2a2b2e] hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer" title="New Message">
           <span className="material-symbols-outlined text-[20px]">edit_square</span>
         </button>
         <button className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-[#2a2b2e] hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer" title="More options">
@@ -26,7 +26,7 @@ export default function SidebarHeader() {
         </button>
       </div>
 
-      {showGroupModal && <CreateGroupModal onClose={() => setShowGroupModal(false)} />}
+      {showComposeModal && <ComposeModal onClose={() => setShowComposeModal(false)} />}
     </header>
   );
 }
