@@ -25,6 +25,14 @@ export default function Home() {
       setError(null);
       
       if (authStep === "identifier") {
+        if (identifierType === "phone" && phone.trim().length < 5) {
+          setError("Please enter a valid phone number.");
+          return;
+        }
+        if (identifierType === "username" && username.trim().length < 3) {
+          setError("Please enter a valid username.");
+          return;
+        }
         setAuthStep("code");
       } else if (authStep === "code") {
         if (mode === "login") {
@@ -79,13 +87,17 @@ export default function Home() {
         {/* Main Auth Card */}
         <div className="w-full max-w-[26rem] bg-white dark:bg-[#18181b] rounded-[24px] shadow-sm border border-slate-200 dark:border-neutral-800 overflow-hidden flex flex-col mb-8 relative z-20">
           
-          {/* 3-Step Tab Navigation */}
+          {/* Dynamic Tab Navigation based on Mode */}
           <div className="bg-slate-50 dark:bg-[#121214] border-b border-slate-100 dark:border-neutral-800 flex items-center justify-between px-6 py-4">
             <div className={`text-xs font-medium ${authStep === 'identifier' ? 'text-[#2C6BED]' : 'text-slate-400 dark:text-neutral-500'}`}>1. Identifier</div>
             <div className={`h-px flex-1 mx-2 ${authStep === 'code' || authStep === 'profile' ? 'bg-[#2C6BED]' : 'bg-slate-200 dark:bg-neutral-800'}`}></div>
             <div className={`text-xs font-medium ${authStep === 'code' ? 'text-[#2C6BED]' : 'text-slate-400 dark:text-neutral-500'}`}>2. Code</div>
-            <div className={`h-px flex-1 mx-2 ${authStep === 'profile' ? 'bg-[#2C6BED]' : 'bg-slate-200 dark:bg-neutral-800'}`}></div>
-            <div className={`text-xs font-medium ${authStep === 'profile' ? 'text-[#2C6BED]' : 'text-slate-400 dark:text-neutral-500'}`}>3. Profile</div>
+            {mode === "register" && (
+              <>
+                <div className={`h-px flex-1 mx-2 ${authStep === 'profile' ? 'bg-[#2C6BED]' : 'bg-slate-200 dark:bg-neutral-800'}`}></div>
+                <div className={`text-xs font-medium ${authStep === 'profile' ? 'text-[#2C6BED]' : 'text-slate-400 dark:text-neutral-500'}`}>3. Profile</div>
+              </>
+            )}
           </div>
 
           <form onSubmit={handleNextStep} className="p-8 flex flex-col items-center">
@@ -96,7 +108,7 @@ export default function Home() {
             </div>
             
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white mt-1 mb-2">
-              {authStep === "profile" ? "Create your profile" : "Welcome to Signal"}
+              {authStep === "profile" ? "Create your profile" : (mode === "login" ? "Log in to Signal" : "Sign up for Signal")}
             </h1>
             
             <p className="text-sm text-slate-500 dark:text-neutral-400 text-center mb-6">
