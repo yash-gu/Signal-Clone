@@ -12,7 +12,6 @@ export default function Home() {
   // Auth Form State
   const [mode, setMode] = useState<"login" | "register">("login");
   const [authStep, setAuthStep] = useState<"identifier" | "code" | "profile">("identifier");
-  const [identifierType, setIdentifierType] = useState<"phone" | "username">("phone");
   const [phone, setPhone] = useState("");
   const [username, setUsername] = useState("");
   const [otp, setOtp] = useState("");
@@ -25,15 +24,9 @@ export default function Home() {
       setError(null);
       
       if (authStep === "identifier") {
-        if (identifierType === "phone") {
-          const digitsOnly = phone.replace(/\D/g, "");
-          if (digitsOnly.length < 7) {
-            setError("Please enter a valid phone number (digits only).");
-            return;
-          }
-        }
-        if (identifierType === "username" && username.trim().length < 3) {
-          setError("Please enter a valid username.");
+        const digitsOnly = phone.replace(/\D/g, "");
+        if (digitsOnly.length < 7) {
+          setError("Please enter a valid phone number (digits only).");
           return;
         }
         setAuthStep("code");
@@ -44,7 +37,7 @@ export default function Home() {
             const res = await fetch(`/api/auth/login`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(identifierType === "phone" ? { phone_number: phone, otp } : { username, otp })
+              body: JSON.stringify({ phone_number: phone, otp })
             });
             if (res.ok) {
               const data = await res.json();
@@ -66,6 +59,11 @@ export default function Home() {
         }
       } else if (authStep === "profile") {
         // Submit Register Flow
+        if (username.trim().length < 3) {
+          setError("Please enter a valid username (min 3 chars).");
+          return;
+        }
+        
         try {
           const generatedPhone = phone || `000${Math.floor(Math.random() * 10000000).toString().padStart(7, '0')}`;
           const res = await fetch(`/api/auth/register`, {
@@ -93,7 +91,7 @@ export default function Home() {
           
           {/* Dynamic Tab Navigation based on Mode */}
           <div className="bg-slate-50 dark:bg-[#121214] border-b border-slate-100 dark:border-neutral-800 flex items-center justify-between px-6 py-4">
-            <div className={`text-xs font-medium ${authStep === 'identifier' ? 'text-[#2C6BED]' : 'text-slate-400 dark:text-neutral-500'}`}>1. Identifier</div>
+            <div className={`text-xs font-medium ${authStep === 'identifier' ? 'text-[#2C6BED]' : 'text-slate-400 dark:text-neutral-500'}`}>1. Phone</div>
             <div className={`h-px flex-1 mx-2 ${authStep === 'code' || authStep === 'profile' ? 'bg-[#2C6BED]' : 'bg-slate-200 dark:bg-neutral-800'}`}></div>
             <div className={`text-xs font-medium ${authStep === 'code' ? 'text-[#2C6BED]' : 'text-slate-400 dark:text-neutral-500'}`}>2. Code</div>
             {mode === "register" && (
@@ -116,7 +114,7 @@ export default function Home() {
             </h1>
             
             <p className="text-sm text-slate-500 dark:text-neutral-400 text-center mb-6">
-              {authStep === "identifier" && (mode === "login" ? "Enter your details to log in to your account." : "Enter your details to create a new account.")}
+              {authStep === "identifier" && (mode === "login" ? "Enter your phone number to log in to your account." : "Enter your phone number to create a new account.")}
               {authStep === "code" && "Enter the 4-digit verification code."}
               {authStep === "profile" && "Set how you appear to your contacts."}
             </p>
@@ -138,60 +136,39 @@ export default function Home() {
                   <button type="button" onClick={() => setMode("register")} className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${mode === 'register' ? 'bg-white dark:bg-[#202124] shadow-sm text-[#2C6BED]' : 'text-slate-500 dark:text-neutral-500 hover:text-slate-700 dark:hover:text-neutral-300'}`}>Sign Up</button>
                 </div>
                 
-                {/* Identifier Type Segmented Toggle */}
-                <div className="flex bg-slate-50 dark:bg-[#121214] p-1 rounded-xl border border-slate-100 dark:border-neutral-800">
-                  <button type="button" onClick={() => setIdentifierType("phone")} className={`flex-1 py-1.5 text-xs font-medium rounded-lg transition-all ${identifierType === 'phone' ? 'bg-white dark:bg-[#202124] shadow-sm text-slate-900 dark:text-white border border-slate-200/60 dark:border-neutral-800' : 'text-slate-400 dark:text-neutral-500 hover:text-slate-600 dark:hover:text-neutral-300'}`}>Phone Number</button>
-                  <button type="button" onClick={() => setIdentifierType("username")} className={`flex-1 py-1.5 text-xs font-medium rounded-lg transition-all ${identifierType === 'username' ? 'bg-white dark:bg-[#202124] shadow-sm text-slate-900 dark:text-white border border-slate-200/60 dark:border-neutral-800' : 'text-slate-400 dark:text-neutral-500 hover:text-slate-600 dark:hover:text-neutral-300'}`}>Username</button>
-                </div>
-
                 {/* Input Fields */}
                 <div className="w-full">
-                  {identifierType === "phone" ? (
-                    <div className="flex items-center bg-white dark:bg-[#121214] border border-slate-200 dark:border-neutral-800 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-[#2C6BED]/20 focus-within:border-[#2C6BED] transition-all">
-                      <div className="relative border-r border-slate-200 dark:border-neutral-800 bg-slate-50 dark:bg-[#18181b] flex items-center group hover:bg-slate-100 dark:hover:bg-[#202124] transition-colors">
-                        <select 
-                          className="appearance-none bg-transparent pl-3 pr-7 py-3 text-sm font-medium text-slate-600 dark:text-neutral-400 outline-none cursor-pointer relative z-10"
-                          defaultValue="+1"
-                          onChange={(e) => {}}
-                        >
-                          <option value="+1">🇺🇸 +1</option>
-                          <option value="+44">🇬🇧 +44</option>
-                          <option value="+91">🇮🇳 +91</option>
-                          <option value="+61">🇦🇺 +61</option>
-                          <option value="+49">🇩🇪 +49</option>
-                        </select>
-                        <span className="material-symbols-outlined text-sm absolute right-2 text-slate-500 dark:text-neutral-500 pointer-events-none z-0 group-hover:text-slate-700 dark:group-hover:text-neutral-300">arrow_drop_down</span>
-                      </div>
-                      <input 
-                        type="tel" 
-                        required 
-                        autoFocus
-                        className="flex-1 p-3 text-slate-900 dark:text-white outline-none w-full bg-transparent placeholder-slate-400 dark:placeholder-neutral-600" 
-                        placeholder="Phone Number" 
-                        value={phone} 
-                        onChange={e => setPhone(e.target.value)} 
-                      />
+                  <div className="flex items-center bg-white dark:bg-[#121214] border border-slate-200 dark:border-neutral-800 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-[#2C6BED]/20 focus-within:border-[#2C6BED] transition-all">
+                    <div className="relative border-r border-slate-200 dark:border-neutral-800 bg-slate-50 dark:bg-[#18181b] flex items-center group hover:bg-slate-100 dark:hover:bg-[#202124] transition-colors">
+                      <select 
+                        className="appearance-none bg-transparent pl-3 pr-7 py-3 text-sm font-medium text-slate-600 dark:text-neutral-400 outline-none cursor-pointer relative z-10"
+                        defaultValue="+1"
+                        onChange={(e) => {}}
+                      >
+                        <option value="+1">🇺🇸 +1</option>
+                        <option value="+44">🇬🇧 +44</option>
+                        <option value="+91">🇮🇳 +91</option>
+                        <option value="+61">🇦🇺 +61</option>
+                        <option value="+49">🇩🇪 +49</option>
+                      </select>
+                      <span className="material-symbols-outlined text-sm absolute right-2 text-slate-500 dark:text-neutral-500 pointer-events-none z-0 group-hover:text-slate-700 dark:group-hover:text-neutral-300">arrow_drop_down</span>
                     </div>
-                  ) : (
-                    <div className="flex items-center bg-white dark:bg-[#121214] border border-slate-200 dark:border-neutral-800 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-[#2C6BED]/20 focus-within:border-[#2C6BED] transition-all">
-                      <div className="px-3 py-3 bg-slate-50 dark:bg-[#18181b] border-r border-slate-200 dark:border-neutral-800 text-slate-400 dark:text-neutral-500 font-medium">@</div>
-                      <input 
-                        type="text" 
-                        required 
-                        autoFocus
-                        className="flex-1 p-3 text-slate-900 dark:text-white outline-none w-full bg-transparent placeholder-slate-400 dark:placeholder-neutral-600" 
-                        placeholder="Username" 
-                        value={username} 
-                        onChange={e => setUsername(e.target.value)} 
-                      />
-                    </div>
-                  )}
+                    <input 
+                      type="tel" 
+                      required 
+                      autoFocus
+                      className="flex-1 p-3 text-slate-900 dark:text-white outline-none w-full bg-transparent placeholder-slate-400 dark:placeholder-neutral-600" 
+                      placeholder="Phone Number" 
+                      value={phone} 
+                      onChange={e => setPhone(e.target.value)} 
+                    />
+                  </div>
                 </div>
                 
                 {/* Evaluator Hint */}
                 {mode === "login" && (
                   <p className="text-center text-sm text-slate-500 dark:text-neutral-500 font-medium -mt-2">
-                    Evaluator Test Account: <strong>1111111111</strong> or <strong>sarah_chen</strong>
+                    Evaluator Test Account: <strong>1111111111</strong>
                   </p>
                 )}
               </div>
@@ -245,16 +222,14 @@ export default function Home() {
                   </div>
                 </div>
                 
-                {identifierType === "phone" && (
-                  <input 
-                    type="text" 
-                    required
-                    className="w-full p-3 bg-white dark:bg-[#121214] border border-slate-200 dark:border-neutral-800 rounded-lg outline-none focus:ring-2 focus:ring-[#2C6BED]/20 focus:border-[#2C6BED] transition-all placeholder-slate-400 dark:placeholder-neutral-600 text-slate-900 dark:text-white" 
-                    placeholder="Create a Username" 
-                    value={username} 
-                    onChange={e => setUsername(e.target.value)} 
-                  />
-                )}
+                <input 
+                  type="text" 
+                  required
+                  className="w-full p-3 bg-white dark:bg-[#121214] border border-slate-200 dark:border-neutral-800 rounded-lg outline-none focus:ring-2 focus:ring-[#2C6BED]/20 focus:border-[#2C6BED] transition-all placeholder-slate-400 dark:placeholder-neutral-600 text-slate-900 dark:text-white" 
+                  placeholder="Create a Username (e.g. jdoe123)" 
+                  value={username} 
+                  onChange={e => setUsername(e.target.value)} 
+                />
                 
                 <input 
                   type="text" 

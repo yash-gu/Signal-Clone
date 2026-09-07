@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Providers from "@/context/Providers";
 import AppLayout from "@/components/layout/AppLayout";
+import { ToastProvider } from "@/context/ToastContext";
 
 export const metadata: Metadata = {
   title: "Signal Desktop Clone",
@@ -26,11 +27,13 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
       </head>
       <body className="bg-surface text-on-surface font-body-md text-body-md antialiased" style={{ overscrollBehavior: 'none' }}>
-        <Providers>
-          <AppLayout>
-            {children}
-          </AppLayout>
-        </Providers>
+        <ToastProvider>
+          <Providers>
+            <AppLayout>
+              {children}
+            </AppLayout>
+          </Providers>
+        </ToastProvider>
       </body>
     </html>
   );

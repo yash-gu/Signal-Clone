@@ -25,6 +25,7 @@ const SocketContext = createContext<SocketContextType | undefined>(undefined);
 
 export function SocketProvider({ children }: { children: ReactNode }) {
   const { token, user } = useAuth();
+  const { showToast } = useToast();
   const [activeConversation, setActiveConversation] = useState<number | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [typingUser, setTypingUser] = useState<number | null>(null);

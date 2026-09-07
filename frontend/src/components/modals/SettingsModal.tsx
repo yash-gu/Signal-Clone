@@ -13,6 +13,8 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
   const [activeTab, setActiveTab] = useState("account");
 
   const [mounted, setMounted] = useState(false);
+  const [displayName, setDisplayName] = useState(user?.display_name || "");
+
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
 
@@ -24,10 +26,10 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
         <div className="w-64 bg-slate-50 dark:bg-[#18181b] border-r border-slate-200 dark:border-neutral-800 flex flex-col">
           <div className="p-4 border-b border-slate-200 dark:border-neutral-800 flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-[#2C6BED] text-white flex items-center justify-center font-bold text-lg shadow-sm">
-              {user?.display_name?.charAt(0).toUpperCase() || "S"}
+              {displayName.charAt(0).toUpperCase() || "S"}
             </div>
             <div className="flex flex-col min-w-0">
-              <span className="font-semibold text-slate-900 dark:text-white truncate">{user?.display_name || "User"}</span>
+              <span className="font-semibold text-slate-900 dark:text-white truncate">{displayName || "User"}</span>
               <span className="text-xs text-slate-500 dark:text-neutral-500 truncate">{user?.phone_number || "Signal User"}</span>
             </div>
           </div>
@@ -77,13 +79,17 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
                   <div className="space-y-4">
                     <div className="flex items-center gap-4">
                        <div className="w-16 h-16 rounded-full bg-[#2C6BED] text-white flex items-center justify-center font-bold text-2xl">
-                        {user?.display_name?.charAt(0).toUpperCase() || "S"}
+                        {displayName.charAt(0).toUpperCase() || "S"}
                        </div>
-                       <button className="px-4 py-2 bg-slate-100 dark:bg-[#2a2b2e] text-slate-900 dark:text-white rounded-lg text-sm font-medium hover:bg-slate-200 dark:hover:bg-[#34353a] transition-colors">Change Avatar</button>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-slate-700 dark:text-neutral-300 mb-1">Display Name</label>
-                      <input type="text" readOnly value={user?.display_name || ""} className="w-full bg-slate-50 dark:bg-[#18181b] border border-slate-200 dark:border-neutral-800 text-slate-900 dark:text-white rounded-lg px-3 py-2 outline-none opacity-70 cursor-not-allowed" />
+                      <input 
+                        type="text" 
+                        value={displayName} 
+                        onChange={(e) => setDisplayName(e.target.value)}
+                        className="w-full bg-slate-50 dark:bg-[#18181b] border border-slate-200 dark:border-neutral-800 text-slate-900 dark:text-white rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-[#2C6BED]/50 transition-all" 
+                      />
                     </div>
                   </div>
                 </div>
