@@ -13,7 +13,16 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     images: ["/icon.png"],
-  }
+  },
+  icons: {
+    icon: [
+      { url: '/icon.png?v=2', type: 'image/png' },
+    ],
+    shortcut: ['/icon.png'],
+    apple: [
+      { url: '/icon.png?v=2', sizes: '180x180', type: 'image/png' },
+    ],
+  },
 };
 
 export default function RootLayout({
