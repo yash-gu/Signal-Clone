@@ -10,6 +10,7 @@ export default function Home() {
   const { activeConversation } = useSocket();
   
   // Auth Form State
+  const [mode, setMode] = useState<"login" | "register">("login");
   const [authStep, setAuthStep] = useState<"identifier" | "code" | "profile">("identifier");
   const [identifierType, setIdentifierType] = useState<"phone" | "username">("phone");
   const [phone, setPhone] = useState("");
@@ -26,13 +27,13 @@ export default function Home() {
       if (authStep === "identifier") {
         setAuthStep("code");
       } else if (authStep === "code") {
-        if (identifierType === "phone") {
+        if (mode === "login") {
           // Login Flow
           try {
             const res = await fetch(`/api/auth/login`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ phone_number: phone, otp })
+              body: JSON.stringify(identifierType === "phone" ? { phone_number: phone, otp } : { username, otp })
             });
             if (res.ok) {
               const data = await res.json();
@@ -40,8 +41,7 @@ export default function Home() {
             } else {
               const data = await res.json();
               if (res.status === 404) {
-                // User not found, need to register
-                setAuthStep("profile");
+                setError("User not found. Please sign up.");
               } else {
                 setError(data.detail || "Invalid code. Try 1234.");
               }
@@ -50,11 +50,11 @@ export default function Home() {
             setError("Server not responding.");
           }
         } else {
-          // Username login logic goes here if backend supports it. For now, fallback to profile registration.
+          // Register Flow -> Move to Profile Step
           setAuthStep("profile");
         }
       } else if (authStep === "profile") {
-        // Register Flow
+        // Submit Register Flow
         try {
           const res = await fetch(`/api/auth/register`, {
             method: "POST",
@@ -95,10 +95,10 @@ export default function Home() {
               <span className="material-symbols-outlined text-2xl block">lock</span>
             </div>
             <h1 className="text-2xl font-bold text-slate-900 mt-1 mb-2">
-              {authStep === "profile" ? "Create your profile" : "Set up Signal"}
+              {authStep === "profile" ? "Create your profile" : (mode === "login" ? "Welcome back" : "Set up Signal")}
             </h1>
             <p className="text-sm text-slate-500 text-center mb-8">
-              {authStep === "identifier" && "Enter your phone number or username to get started."}
+              {authStep === "identifier" && (mode === "login" ? "Enter your phone number or username to log in." : "Enter your phone number or username to register.")}
               {authStep === "code" && "Enter the 4-digit verification code."}
               {authStep === "profile" && "Set how you appear to your contacts."}
             </p>
@@ -152,30 +152,45 @@ export default function Home() {
                     </div>
                   )}
                 </div>
-                
-                {/* Small Muted Badge */}
-                <div className="flex justify-center">
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-100 text-slate-500 text-xs font-mono border border-slate-200/60">
-                    <span className="material-symbols-outlined text-[14px]">lock</span> 
-                    SMS Protocol Token: SHA-256
-                  </span>
-                </div>
               </div>
             )}
 
             {/* Step 2: Code */}
             {authStep === "code" && (
               <div className="w-full flex flex-col gap-6">
-                <input 
-                  type="text" 
-                  required 
-                  autoFocus
-                  className="w-full p-4 text-center text-2xl tracking-[0.5em] font-mono bg-white border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-[#2C6BED]/20 focus:border-[#2C6BED] transition-all placeholder-slate-300" 
-                  placeholder="----" 
-                  maxLength={4}
-                  value={otp} 
-                  onChange={e => setOtp(e.target.value)} 
-                />
+                <div className="flex justify-center gap-3">
+                  {[0, 1, 2, 3].map((index) => (
+                    <input
+                      key={index}
+                      id={`otp-${index}`}
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={1}
+                      autoFocus={index === 0}
+                      className="w-14 h-16 text-center text-3xl font-semibold bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-[#2C6BED]/20 focus:border-[#2C6BED] transition-all shadow-sm"
+                      value={otp[index] || ""}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (!/^\d*$/.test(val)) return; // Only allow digits
+                        
+                        const newOtp = otp.split('');
+                        newOtp[index] = val;
+                        setOtp(newOtp.join(''));
+                        
+                        // Focus next input
+                        if (val && index < 3) {
+                          document.getElementById(`otp-${index + 1}`)?.focus();
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Backspace" && !otp[index] && index > 0) {
+                          document.getElementById(`otp-${index - 1}`)?.focus();
+                        }
+                      }}
+                    />
+                  ))}
+                </div>
+                <p className="text-center text-sm text-slate-500 font-medium">Enter test code: 1234</p>
               </div>
             )}
 
@@ -215,6 +230,16 @@ export default function Home() {
               <button type="submit" className="bg-[#2C6BED] hover:bg-blue-600 text-white font-medium py-3 rounded-xl w-full transition-colors active:scale-[0.98]">
                 {authStep === "profile" ? "Complete Setup" : "Continue →"}
               </button>
+              
+              {authStep === "identifier" && (
+                <div className="mt-4 text-center">
+                  {mode === "login" ? (
+                    <p className="text-sm text-slate-500">Don't have an account? <button type="button" onClick={() => setMode("register")} className="text-[#2C6BED] font-medium hover:underline outline-none">Sign up</button></p>
+                  ) : (
+                    <p className="text-sm text-slate-500">Already have an account? <button type="button" onClick={() => setMode("login")} className="text-[#2C6BED] font-medium hover:underline outline-none">Log in</button></p>
+                  )}
+                </div>
+              )}
               
               <div className="mt-6 p-4 bg-teal-50/50 rounded-xl border border-teal-100/50 flex items-start gap-3">
                 <span className="material-symbols-outlined text-teal-600 text-xl shrink-0 mt-0.5">verified_user</span>
