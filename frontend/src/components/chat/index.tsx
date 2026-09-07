@@ -20,7 +20,6 @@ export default function ChatPane() {
           <h2 className="text-slate-800 dark:text-white font-bold text-xl mt-4">Welcome to Signal</h2>
           <p className="text-slate-500 dark:text-neutral-400 mt-2 text-sm">See what's new in this update</p>
         </div>
-        <p className="absolute bottom-6 text-slate-400 dark:text-neutral-600 text-xs">Signal is a 501c3 nonprofit</p>
       </section>
     );
   }

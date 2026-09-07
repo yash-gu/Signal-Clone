@@ -174,17 +174,19 @@ export default function ConversationList() {
               className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all relative overflow-hidden group ${isActive ? "bg-blue-50 dark:bg-blue-900/20" : "hover:bg-slate-50 dark:hover:bg-[#2a2b2e]"}`}
             >
               {isActive && <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-600 dark:bg-blue-500 rounded-r-full"></div>}
-              <div className="relative flex-shrink-0 w-12 h-12 rounded-full bg-slate-200 dark:bg-[#383a3f] text-slate-700 dark:text-neutral-200 flex items-center justify-center shadow-sm overflow-hidden">
-                 {conv.is_group ? (
-                   <span className="material-symbols-outlined text-[20px]">hub</span>
-                 ) : (
-                   <span className="font-semibold text-lg flex items-center justify-center">
-                     {displayName.charAt(0).toUpperCase()}
-                   </span>
-                 )}
+              <div className="relative flex-shrink-0 w-12 h-12">
+                <div className="w-full h-full rounded-full bg-slate-200 dark:bg-[#383a3f] text-slate-700 dark:text-neutral-200 flex items-center justify-center shadow-sm overflow-hidden">
+                   {conv.is_group ? (
+                     <span className="material-symbols-outlined text-[20px]">hub</span>
+                   ) : (
+                     <span className="font-semibold text-lg flex items-center justify-center">
+                       {displayName.charAt(0).toUpperCase()}
+                     </span>
+                   )}
+                </div>
                 {!conv.is_group && (
-                  <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-white dark:bg-[#202124] rounded-full flex items-center justify-center">
-                    <span className="material-symbols-outlined text-green-500 dark:text-green-400 text-[11px]" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+                  <span className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-white dark:bg-[#202124] rounded-full flex items-center justify-center shadow-sm">
+                    <span className="material-symbols-outlined text-green-500 dark:text-green-400 text-[12px]" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
                   </span>
                 )}
               </div>

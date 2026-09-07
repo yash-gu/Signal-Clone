@@ -11,6 +11,7 @@ router = APIRouter()
 class AddContactRequest(BaseModel):
     contact_id: int
 
+@router.get("")
 @router.get("/", response_model=List[UserResponse])
 async def get_contacts(current_user: dict = Depends(get_current_user), db: aiosqlite.Connection = Depends(get_db)):
     query = '''
@@ -23,6 +24,7 @@ async def get_contacts(current_user: dict = Depends(get_current_user), db: aiosq
         rows = await cursor.fetchall()
         return [dict(row) for row in rows]
 
+@router.post("")
 @router.post("/")
 async def add_contact(req: AddContactRequest, current_user: dict = Depends(get_current_user), db: aiosqlite.Connection = Depends(get_db)):
     if req.contact_id == current_user['id']:

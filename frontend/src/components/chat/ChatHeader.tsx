@@ -51,15 +51,17 @@ export default function ChatHeader({ showSettings, setShowSettings }: ChatHeader
         >
           <span className="material-symbols-outlined text-[1.375rem]">arrow_back</span>
         </button>
-        <div className="relative flex-shrink-0 w-10 h-10 rounded-full bg-surface-container-high text-primary flex items-center justify-center shadow-xs overflow-hidden border border-outline-variant/20">
-          {conversation?.is_group ? (
-             <span className="material-symbols-outlined text-xl">hub</span>
-           ) : (
-             <span className="font-headline-sm text-headline-sm text-on-surface flex items-center justify-center">
-               {displayName.charAt(0).toUpperCase()}
-             </span>
-           )}
-          <span className="absolute bottom-0 right-0 w-3 h-3 bg-secondary rounded-full border-2 border-surface-container-lowest"></span>
+        <div className="relative flex-shrink-0 w-10 h-10">
+          <div className="w-full h-full rounded-full bg-surface-container-high text-primary flex items-center justify-center shadow-xs overflow-hidden border border-outline-variant/20">
+            {conversation?.is_group ? (
+               <span className="material-symbols-outlined text-xl">hub</span>
+             ) : (
+               <span className="font-headline-sm text-headline-sm text-on-surface flex items-center justify-center">
+                 {displayName.charAt(0).toUpperCase()}
+               </span>
+             )}
+          </div>
+          <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-secondary rounded-full border-2 border-surface-container-lowest"></span>
         </div>
         <div className="flex flex-col min-w-0">
           <div className="flex items-center gap-space-xs">
@@ -76,24 +78,11 @@ export default function ChatHeader({ showSettings, setShowSettings }: ChatHeader
       </div>
       
       <div className="flex items-center gap-1">
-        <button onClick={() => alert("Voice calls coming soon!")} className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-surface-container-highest text-on-surface-variant transition-colors cursor-pointer" title="Voice Call (Coming Soon)">
-          <span className="material-symbols-outlined text-[1.375rem]">call</span>
-        </button>
-        <button onClick={() => alert("Video calls coming soon!")} className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-surface-container-highest text-on-surface-variant transition-colors cursor-pointer" title="Video Call (Coming Soon)">
-          <span className="material-symbols-outlined text-[1.375rem]">videocam</span>
-        </button>
-        <div className="w-px h-5 bg-outline-variant/30 mx-1"></div>
-        <button className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-surface-container-highest text-on-surface-variant transition-colors cursor-pointer" title="Search">
-          <span className="material-symbols-outlined text-[1.375rem]">search</span>
-        </button>
         {!!conversation?.is_group && (
           <button onClick={() => setShowSettings(!showSettings)} className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-surface-container-highest text-on-surface-variant transition-colors cursor-pointer" title="Group Info">
             <span className="material-symbols-outlined text-[1.375rem]">info</span>
           </button>
         )}
-        <button className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-surface-container-highest text-on-surface-variant transition-colors cursor-pointer" title="More options">
-          <span className="material-symbols-outlined text-[1.375rem]">more_vert</span>
-        </button>
       </div>
 
     </header>

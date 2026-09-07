@@ -13,7 +13,7 @@ async def get_me(current_user: dict = Depends(get_current_user)):
 
 @router.get("/search", response_model=List[UserResponse])
 async def search_users(q: str, current_user: dict = Depends(get_current_user), db: aiosqlite.Connection = Depends(get_db)):
-    if not q or len(q) < 2:
+    if not q or not q.strip():
         return []
         
     query = '''

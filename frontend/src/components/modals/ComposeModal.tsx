@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useAuth } from "@/context/AuthContext";
 import { useSocket } from "@/context/SocketContext";
-import AddContactModal from "./AddContactModal";
+import { useToast } from "@/context/ToastContext";
 
 interface ComposeModalProps {
   onClose: () => void;
@@ -12,20 +12,21 @@ interface ComposeModalProps {
 export default function ComposeModal({ onClose }: ComposeModalProps) {
   const { token } = useAuth();
   const { setActiveConversation, refreshConversations } = useSocket();
+  const { showToast } = useToast();
   
-  const [mode, setMode] = useState<"direct" | "group">("direct");
+  const [mode, setMode] = useState<"direct" | "group" | "add_contact">("direct");
   const [groupName, setGroupName] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [contacts, setContacts] = useState<any[]>([]);
   const [selectedContacts, setSelectedContacts] = useState<any[]>([]);
   const [isCreating, setIsCreating] = useState(false);
-  const [showAddContact, setShowAddContact] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
 
   const fetchContacts = async () => {
     if (!token) return;
     try {
-      const res = await fetch("/api/contacts", {
+      const res = await fetch("/api/contacts/", {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -61,7 +62,33 @@ export default function ComposeModal({ onClose }: ComposeModalProps) {
   }, [searchQuery, token, selectedContacts]);
 
   const toggleContact = async (contact: any) => {
-    if (mode === "group") {
+    if (mode === "add_contact") {
+      setIsAdding(true);
+      try {
+        const res = await fetch(`/api/contacts/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({ contact_id: contact.id })
+        });
+        if (res.ok) {
+          showToast("Contact added successfully", "success");
+          fetchContacts();
+          setMode("direct");
+          setSearchQuery("");
+        } else {
+          const errorData = await res.json();
+          showToast(errorData.detail || "Failed to add contact", "error", "Error");
+        }
+      } catch (e) {
+        console.error(e);
+        showToast("Network error while adding contact", "error", "Error");
+      } finally {
+        setIsAdding(false);
+      }
+    } else if (mode === "group") {
       setSelectedContacts([...selectedContacts, contact]);
       setSearchQuery("");
     } else {
@@ -138,11 +165,23 @@ export default function ComposeModal({ onClose }: ComposeModalProps) {
         
         {/* Header */}
         <div className="px-6 py-4 flex items-center gap-4 border-b border-slate-100 dark:border-neutral-800">
-          <button onClick={onClose} className="w-8 h-8 rounded-full hover:bg-slate-100 dark:hover:bg-[#2e2f33] flex items-center justify-center text-slate-500 dark:text-neutral-400 transition-colors">
+          <button 
+            onClick={() => {
+              if (mode === "add_contact") {
+                setMode("direct");
+                setSearchQuery("");
+              } else {
+                onClose();
+              }
+            }} 
+            className="w-8 h-8 rounded-full hover:bg-slate-100 dark:hover:bg-[#2e2f33] flex items-center justify-center text-slate-500 dark:text-neutral-400 transition-colors"
+          >
             <span className="material-symbols-outlined text-[20px]">arrow_back</span>
           </button>
           <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
-            {mode === "direct" ? "New Message" : "New Group"}
+            {mode === "direct" && "New Message"}
+            {mode === "group" && "New Group"}
+            {mode === "add_contact" && "Add Contact"}
           </h2>
         </div>
 
@@ -162,7 +201,7 @@ export default function ComposeModal({ onClose }: ComposeModalProps) {
               </button>
               
               <button 
-                onClick={() => setShowAddContact(true)}
+                onClick={() => { setMode("add_contact"); setSearchQuery(""); }}
                 className="flex items-center gap-4 w-full p-2 hover:bg-slate-50 dark:hover:bg-[#2e2f33] rounded-xl transition-colors group"
               >
                 <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-[#2a2b2e] flex items-center justify-center text-slate-600 dark:text-neutral-300 group-hover:bg-[#2C6BED] group-hover:text-white transition-colors">
@@ -204,11 +243,17 @@ export default function ComposeModal({ onClose }: ComposeModalProps) {
               </div>
             )}
 
+            {mode === "add_contact" && (
+              <p className="text-sm text-slate-500 dark:text-neutral-400 mb-4 px-2">
+                Search for people by their phone number or username.
+              </p>
+            )}
+
             <div className="relative mb-4">
               <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl pointer-events-none">search</span>
               <input 
                 type="text" 
-                placeholder={mode === "direct" ? "Search contacts or globally..." : "Search contacts to add..."} 
+                placeholder={mode === "add_contact" ? "Phone number or username..." : mode === "direct" ? "Search contacts or globally..." : "Search contacts to add..."} 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full bg-slate-50 dark:bg-[#18181b] text-slate-900 dark:text-white pl-10 pr-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-[#2C6BED]/50 transition-all placeholder:text-slate-400 border border-slate-200 dark:border-neutral-800"
@@ -260,13 +305,6 @@ export default function ComposeModal({ onClose }: ComposeModalProps) {
         )}
 
       </div>
-      
-      {showAddContact && (
-        <AddContactModal 
-          onClose={() => setShowAddContact(false)} 
-          onContactAdded={fetchContacts} 
-        />
-      )}
     </div>,
     document.body
   );

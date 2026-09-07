@@ -124,7 +124,7 @@ export function SocketProvider({ children }: { children: ReactNode }) {
           ));
         }
       } else if (data.type === "typing") {
-        if (data.conversation_id === activeConversation) {
+        if (data.conversation_id === activeConversation && data.user_id !== user?.id) {
           setTypingUser(data.user_id);
           if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
           typingTimeoutRef.current = setTimeout(() => setTypingUser(null), 3000);
