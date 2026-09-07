@@ -1,14 +1,31 @@
 "use client";
 import { useSocket } from "@/context/SocketContext";
 import { useAuth } from "@/context/AuthContext";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import EmojiPicker, { Theme } from "emoji-picker-react";
 
 export default function MessageInput() {
   const { sendMessage, sendTyping, replyingTo, setReplyingTo, expiresIn } = useSocket();
   const { token } = useAuth();
   const [content, setContent] = useState("");
   const [isUploading, setIsUploading] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const emojiPickerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target as Node)) {
+        setShowEmojiPicker(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const onEmojiClick = (emojiData: any) => {
+    setContent(prev => prev + emojiData.emoji);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,9 +117,28 @@ export default function MessageInput() {
             onKeyDown={handleKeyDown}
           />
           <div className="absolute right-3 flex items-center gap-space-2xs text-outline">
-            <button className="w-8 h-8 flex items-center justify-center hover:text-on-surface transition-colors cursor-pointer" title="Insert Emoji" type="button">
-              <span className="material-symbols-outlined text-xl">sentiment_satisfied</span>
-            </button>
+            <div className="relative" ref={emojiPickerRef}>
+              <button 
+                className={`w-8 h-8 flex items-center justify-center transition-colors cursor-pointer ${showEmojiPicker ? 'text-primary' : 'hover:text-on-surface'}`} 
+                title="Insert Emoji" 
+                type="button"
+                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+              >
+                <span className="material-symbols-outlined text-xl">sentiment_satisfied</span>
+              </button>
+              
+              {showEmojiPicker && (
+                <div className="absolute bottom-full right-0 mb-4 z-[9999] shadow-2xl rounded-xl overflow-hidden border border-outline-variant/20">
+                  <EmojiPicker 
+                    onEmojiClick={onEmojiClick}
+                    theme={document.documentElement.classList.contains('dark') ? Theme.DARK : Theme.LIGHT}
+                    autoFocusSearch={false}
+                    lazyLoadEmojis={true}
+                    skinTonesDisabled
+                  />
+                </div>
+              )}
+            </div>
             <button className="w-8 h-8 flex items-center justify-center hover:text-on-surface transition-colors cursor-pointer" title="Voice note" type="button">
               <span className="material-symbols-outlined text-xl">mic</span>
             </button>
