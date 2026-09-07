@@ -82,7 +82,7 @@ export default function ChatHeader() {
         <button className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-surface-container-highest text-on-surface-variant transition-colors cursor-pointer" title="Search">
           <span className="material-symbols-outlined text-[1.375rem]">search</span>
         </button>
-        {conversation?.is_group && (
+        {!!conversation?.is_group && (
           <button onClick={() => setShowSettings(!showSettings)} className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-surface-container-highest text-on-surface-variant transition-colors cursor-pointer" title="Group Info">
             <span className="material-symbols-outlined text-[1.375rem]">info</span>
           </button>

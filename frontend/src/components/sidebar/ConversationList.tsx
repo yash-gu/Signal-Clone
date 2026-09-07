@@ -21,6 +21,7 @@ export default function ConversationList() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [filterUnread, setFilterUnread] = useState(false);
 
   // Re-fetch conversations when a new message is received (messages array changes length)
   useEffect(() => {
@@ -113,7 +114,7 @@ export default function ConversationList() {
                <span className="material-symbols-outlined text-[18px]">close</span>
              </button>
           ) : (
-             <button className="absolute right-2 text-slate-400 hover:text-slate-600 dark:text-neutral-500 dark:hover:text-neutral-300 transition-colors cursor-pointer" title="Filter unread">
+             <button onClick={() => setFilterUnread(!filterUnread)} className={`absolute right-2 transition-colors cursor-pointer ${filterUnread ? 'text-[#2C6BED]' : 'text-slate-400 hover:text-slate-600 dark:text-neutral-500 dark:hover:text-neutral-300'}`} title="Filter unread">
                <span className="material-symbols-outlined text-[18px]">filter_list</span>
              </button>
           )}
@@ -145,12 +146,18 @@ export default function ConversationList() {
               ))
             )}
           </div>
-        ) : conversations.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full pt-20">
-            <h2 className="text-slate-500 dark:text-neutral-400 font-medium">No chats</h2>
-            <p className="text-slate-400 dark:text-neutral-500 text-xs mt-1">Recent chats will appear here.</p>
           </div>
-        ) : conversations.map(conv => {
+        ) : (() => {
+          const displayedConversations = filterUnread ? conversations.filter(c => c.unread_count > 0) : conversations;
+          if (displayedConversations.length === 0) {
+            return (
+              <div className="flex flex-col items-center justify-center h-full pt-20">
+                <h2 className="text-slate-500 dark:text-neutral-400 font-medium">{filterUnread ? "No unread chats" : "No chats"}</h2>
+                <p className="text-slate-400 dark:text-neutral-500 text-xs mt-1">{filterUnread ? "You're all caught up!" : "Recent chats will appear here."}</p>
+              </div>
+            );
+          }
+          return displayedConversations.map(conv => {
           const isActive = conv.id === activeConversation;
           let displayName = conv.name || "Unknown Conversation";
           
@@ -204,7 +211,7 @@ export default function ConversationList() {
               </div>
             </div>
           );
-        })}
+        })})()}
       </div>
     </>
   );
