@@ -9,22 +9,21 @@ export default function ChatPane() {
 
   if (!activeConversation) {
     return (
-      <section className="flex-1 flex flex-col items-center justify-center h-full bg-surface-container-low relative min-w-0">
-        <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#0052cd_1px,transparent_1px)] [background-size:16px_16px]"></div>
+      <section className="flex-1 flex flex-col items-center justify-center h-full bg-slate-50 dark:bg-[#121214] relative min-w-0">
         <div className="text-center z-10 flex flex-col items-center">
-          <div className="w-24 h-24 bg-surface-container rounded-full flex items-center justify-center mb-6 shadow-sm overflow-hidden p-4">
-            <img src="/logo.png" alt="Signal Web Clone Logo" className="w-full h-full object-contain opacity-60" />
+          <div className="w-20 h-20 rounded-full border-2 border-dashed border-slate-300 dark:border-neutral-700 flex items-center justify-center">
+            <span className="material-symbols-outlined text-[36px] text-slate-300 dark:text-neutral-700" style={{ fontVariationSettings: "'FILL' 1" }}>chat_bubble</span>
           </div>
-          <h2 className="text-title-lg font-title-lg text-on-surface mb-2 tracking-tight">Signal Web Clone</h2>
-          <p className="text-body-md text-on-surface-variant max-w-sm">Select a conversation from the sidebar or start a new chat to begin messaging.</p>
+          <h2 className="text-slate-800 dark:text-white font-bold text-xl mt-4">Welcome to Signal</h2>
+          <p className="text-slate-500 dark:text-neutral-400 mt-2 text-sm">See what's new in this update</p>
         </div>
+        <p className="absolute bottom-6 text-slate-400 dark:text-neutral-600 text-xs">Signal is a 501c3 nonprofit</p>
       </section>
     );
   }
 
   return (
-    <section className="flex-1 flex flex-col h-full bg-surface-container-low relative min-w-0">
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#0052cd_1px,transparent_1px)] [background-size:16px_16px]"></div>
+    <section className="flex-1 flex flex-col h-full bg-white dark:bg-[#121214] relative min-w-0">
       <ChatHeader />
       <SecurityBanner />
       <MessageList />

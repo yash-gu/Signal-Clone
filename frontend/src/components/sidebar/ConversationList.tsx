@@ -98,19 +98,23 @@ export default function ConversationList() {
   return (
     <>
       {/* Filter Tabs / Search Bar */}
-      <div className="px-space-md py-space-xs mb-2">
-        <div className="relative">
-          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl pointer-events-none">search</span>
+      <div className="px-4 pb-3">
+        <div className="relative flex items-center">
+          <span className="material-symbols-outlined absolute left-3 text-slate-400 dark:text-neutral-500 text-[18px] pointer-events-none">search</span>
           <input 
             type="text" 
-            placeholder="Search contacts..." 
+            placeholder="Search" 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-surface-container-high text-on-surface pl-10 pr-4 py-2 rounded-xl text-body-md outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-on-surface-variant"
+            className="w-full bg-slate-100 dark:bg-[#2a2b2e] text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-neutral-500 pl-9 pr-10 py-1.5 rounded-lg text-sm outline-none focus:ring-1 focus:ring-blue-500 transition-all border border-transparent dark:border-[#383a3f]"
           />
-          {searchQuery && (
-             <button onClick={() => setSearchQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface">
-               <span className="material-symbols-outlined text-sm">close</span>
+          {searchQuery ? (
+             <button onClick={() => setSearchQuery("")} className="absolute right-2 text-slate-400 hover:text-slate-600 dark:text-neutral-500 dark:hover:text-neutral-300">
+               <span className="material-symbols-outlined text-[18px]">close</span>
+             </button>
+          ) : (
+             <button className="absolute right-2 text-slate-400 hover:text-slate-600 dark:text-neutral-500 dark:hover:text-neutral-300 transition-colors cursor-pointer" title="Filter unread">
+               <span className="material-symbols-outlined text-[18px]">filter_list</span>
              </button>
           )}
         </div>
@@ -141,6 +145,11 @@ export default function ConversationList() {
               ))
             )}
           </div>
+        ) : conversations.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full pt-20">
+            <h2 className="text-slate-500 dark:text-neutral-400 font-medium">No chats</h2>
+            <p className="text-slate-400 dark:text-neutral-500 text-xs mt-1">Recent chats will appear here.</p>
+          </div>
         ) : conversations.map(conv => {
           const isActive = conv.id === activeConversation;
           let displayName = conv.name || "Unknown Conversation";
@@ -156,38 +165,38 @@ export default function ConversationList() {
             <div 
               key={conv.id}
               onClick={() => setActiveConversation(conv.id)}
-              className={`flex items-center gap-space-md p-space-sm rounded-xl cursor-pointer transition-all relative overflow-hidden group ${isActive ? "bg-primary-fixed/30 shadow-xs" : "hover:bg-surface-container-low"}`}
+              className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all relative overflow-hidden group ${isActive ? "bg-blue-50 dark:bg-blue-900/20" : "hover:bg-slate-50 dark:hover:bg-[#2a2b2e]"}`}
             >
-              {isActive && <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary-container rounded-r-full"></div>}
-              <div className="relative flex-shrink-0 w-12 h-12 rounded-full bg-surface-container-high text-primary flex items-center justify-center shadow-xs overflow-hidden">
+              {isActive && <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-600 dark:bg-blue-500 rounded-r-full"></div>}
+              <div className="relative flex-shrink-0 w-12 h-12 rounded-full bg-slate-200 dark:bg-[#383a3f] text-slate-700 dark:text-neutral-200 flex items-center justify-center shadow-sm overflow-hidden">
                  {conv.is_group ? (
-                   <span className="material-symbols-outlined text-2xl">hub</span>
+                   <span className="material-symbols-outlined text-[20px]">hub</span>
                  ) : (
-                   <span className="font-headline-sm text-headline-sm text-on-surface flex items-center justify-center">
+                   <span className="font-semibold text-lg flex items-center justify-center">
                      {displayName.charAt(0).toUpperCase()}
                    </span>
                  )}
                 {!conv.is_group && (
-                  <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-surface-container-lowest rounded-full flex items-center justify-center">
-                    <span className="material-symbols-outlined text-secondary text-[11px]" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+                  <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-white dark:bg-[#202124] rounded-full flex items-center justify-center">
+                    <span className="material-symbols-outlined text-green-500 dark:text-green-400 text-[11px]" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
                   </span>
                 )}
               </div>
               <div className="flex-1 min-w-0 flex flex-col justify-center">
-                <div className="flex items-baseline justify-between mb-0.5">
-                  <span className={`font-headline-sm text-headline-sm truncate ${conv.unread_count > 0 ? "text-on-surface font-bold" : "text-on-surface"}`}>
+                <div className="flex items-baseline justify-between mb-1">
+                  <span className={`text-sm truncate ${conv.unread_count > 0 ? "text-slate-900 dark:text-white font-bold" : "text-slate-900 dark:text-neutral-200 font-medium"}`}>
                     {displayName}
                   </span>
-                  <span className={`text-[11px] font-medium whitespace-nowrap ml-2 ${conv.unread_count > 0 ? "text-primary" : "text-on-surface-variant"}`}>
+                  <span className={`text-[11px] font-medium whitespace-nowrap ml-2 ${conv.unread_count > 0 ? "text-blue-600 dark:text-blue-400" : "text-slate-400 dark:text-neutral-500"}`}>
                     {new Date(conv.last_message_time || conv.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                   </span>
                 </div>
-                <div className="flex items-center justify-between gap-space-xs">
-                  <p className={`font-body-sm text-body-sm truncate ${conv.unread_count > 0 ? "text-on-surface font-semibold" : "text-on-surface-variant"}`}>
+                <div className="flex items-center justify-between gap-2">
+                  <p className={`text-xs truncate ${conv.unread_count > 0 ? "text-slate-900 dark:text-white font-semibold" : "text-slate-500 dark:text-neutral-400"}`}>
                     {conv.last_message || "No messages yet"}
                   </p>
                   {conv.unread_count > 0 && (
-                    <span className="flex-shrink-0 w-5 h-5 bg-primary text-on-primary rounded-full flex items-center justify-center text-[10px] font-bold shadow-xs">
+                    <span className="flex-shrink-0 w-5 h-5 bg-blue-600 dark:bg-blue-500 text-white rounded-full flex items-center justify-center text-[10px] font-bold shadow-sm">
                       {conv.unread_count > 99 ? '99+' : conv.unread_count}
                     </span>
                   )}

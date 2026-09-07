@@ -1,45 +1,28 @@
 "use client";
-import { useAuth } from "@/context/AuthContext";
 import { useState } from "react";
 import CreateGroupModal from "@/components/modals/CreateGroupModal";
 
 export default function SidebarHeader() {
-  const { user, logout } = useAuth();
-  const displayName = user?.display_name || user?.username || "Unknown User";
   const [showGroupModal, setShowGroupModal] = useState(false);
   
   return (
-    <header className="px-space-md py-space-sm h-16 flex items-center justify-between z-20">
-      <div className="flex items-center gap-space-sm min-w-0">
-        <div className="relative cursor-pointer group">
-          <div className="w-10 h-10 rounded-full bg-surface-container-high text-primary font-headline-sm text-headline-sm flex items-center justify-center shadow-xs border border-outline-variant/20 overflow-hidden">
-            {displayName.charAt(0).toUpperCase()}
+    <header className="px-4 py-3 h-14 flex items-center justify-between z-20">
+      <div className="flex items-center gap-4">
+        {/* Profile Hamburger */}
+        <button className="text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white transition-colors" title="Menu">
+          <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-[#2a2b2e] flex items-center justify-center overflow-hidden">
+            <span className="material-symbols-outlined text-[20px]">person</span>
           </div>
-          <span className="absolute bottom-0 right-0 w-3 h-3 bg-secondary rounded-full border-2 border-surface-container-lowest"></span>
-        </div>
-        <div className="flex flex-col min-w-0">
-          <span className="font-headline-sm text-headline-sm text-on-surface truncate pr-2">
-            {displayName}
-          </span>
-          <span className="font-label-sm text-label-sm text-secondary flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-secondary"></span>
-            Encrypted Session
-          </span>
-        </div>
+        </button>
+        <h1 className="text-slate-900 dark:text-white font-semibold text-xl">Chats</h1>
       </div>
 
-      <div className="flex items-center gap-1 text-on-surface-variant">
-        <button onClick={() => alert("Linked Devices coming soon!")} className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-surface-container-high hover:text-on-surface transition-colors cursor-pointer" title="Linked Devices">
-          <span className="material-symbols-outlined text-[1.375rem]">devices</span>
+      <div className="flex items-center gap-2 text-slate-500 dark:text-neutral-400">
+        <button onClick={() => setShowGroupModal(true)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-[#2a2b2e] hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer" title="New Message">
+          <span className="material-symbols-outlined text-[20px]">edit_square</span>
         </button>
-        <button className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-surface-container-high hover:text-on-surface transition-colors cursor-pointer" title="New Message">
-          <span className="material-symbols-outlined text-[1.375rem]">edit_square</span>
-        </button>
-        <button onClick={() => setShowGroupModal(true)} className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-surface-container-high hover:text-on-surface transition-colors cursor-pointer" title="New Group">
-          <span className="material-symbols-outlined text-[1.375rem]">group_add</span>
-        </button>
-        <button onClick={logout} className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-surface-container-high hover:text-error transition-colors cursor-pointer" title="Logout">
-          <span className="material-symbols-outlined text-[1.375rem]">logout</span>
+        <button className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-[#2a2b2e] hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer" title="More options">
+          <span className="material-symbols-outlined text-[20px]">more_vert</span>
         </button>
       </div>
 

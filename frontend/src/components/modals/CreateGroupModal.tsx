@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useAuth } from "@/context/AuthContext";
 import { useSocket } from "@/context/SocketContext";
 
@@ -75,8 +76,13 @@ export default function CreateGroupModal({ onClose }: CreateGroupModalProps) {
     }
   };
 
-  return (
-    <div className="fixed inset-0 bg-surface-container-lowest/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  if (!mounted) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 bg-surface-container-lowest/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
       <div className="bg-surface-container-low rounded-3xl w-full max-w-md shadow-lg border border-outline-variant/30 flex flex-col max-h-[90vh]">
         
         <div className="px-6 py-4 border-b border-outline-variant/20 flex items-center justify-between">
@@ -164,6 +170,7 @@ export default function CreateGroupModal({ onClose }: CreateGroupModalProps) {
         </div>
 
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

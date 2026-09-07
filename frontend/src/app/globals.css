@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
 @theme {
   --color-outline-variant: #c3c6d7;
   --color-surface-dim: #d2d9f4;

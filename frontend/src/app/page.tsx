@@ -77,15 +77,15 @@ export default function Home() {
     return (
       <div className="flex-1 flex flex-col items-center justify-center w-full min-h-screen px-4 pb-12">
         {/* Main Auth Card */}
-        <div className="w-full max-w-[26rem] bg-white rounded-[24px] shadow-sm border border-slate-200 overflow-hidden flex flex-col mb-8 relative z-20">
+        <div className="w-full max-w-[26rem] bg-white dark:bg-[#18181b] rounded-[24px] shadow-sm border border-slate-200 dark:border-neutral-800 overflow-hidden flex flex-col mb-8 relative z-20">
           
           {/* 3-Step Tab Navigation */}
-          <div className="bg-slate-50 border-b border-slate-100 flex items-center justify-between px-6 py-4">
-            <div className={`text-xs font-medium ${authStep === 'identifier' ? 'text-[#2C6BED]' : 'text-slate-400'}`}>1. Identifier</div>
-            <div className={`h-px flex-1 mx-2 ${authStep === 'code' || authStep === 'profile' ? 'bg-[#2C6BED]' : 'bg-slate-200'}`}></div>
-            <div className={`text-xs font-medium ${authStep === 'code' ? 'text-[#2C6BED]' : 'text-slate-400'}`}>2. Code</div>
-            <div className={`h-px flex-1 mx-2 ${authStep === 'profile' ? 'bg-[#2C6BED]' : 'bg-slate-200'}`}></div>
-            <div className={`text-xs font-medium ${authStep === 'profile' ? 'text-[#2C6BED]' : 'text-slate-400'}`}>3. Profile</div>
+          <div className="bg-slate-50 dark:bg-[#121214] border-b border-slate-100 dark:border-neutral-800 flex items-center justify-between px-6 py-4">
+            <div className={`text-xs font-medium ${authStep === 'identifier' ? 'text-[#2C6BED]' : 'text-slate-400 dark:text-neutral-500'}`}>1. Identifier</div>
+            <div className={`h-px flex-1 mx-2 ${authStep === 'code' || authStep === 'profile' ? 'bg-[#2C6BED]' : 'bg-slate-200 dark:bg-neutral-800'}`}></div>
+            <div className={`text-xs font-medium ${authStep === 'code' ? 'text-[#2C6BED]' : 'text-slate-400 dark:text-neutral-500'}`}>2. Code</div>
+            <div className={`h-px flex-1 mx-2 ${authStep === 'profile' ? 'bg-[#2C6BED]' : 'bg-slate-200 dark:bg-neutral-800'}`}></div>
+            <div className={`text-xs font-medium ${authStep === 'profile' ? 'text-[#2C6BED]' : 'text-slate-400 dark:text-neutral-500'}`}>3. Profile</div>
           </div>
 
           <form onSubmit={handleNextStep} className="p-8 flex flex-col items-center">
@@ -95,13 +95,19 @@ export default function Home() {
               <span className="material-symbols-outlined text-2xl block">lock</span>
             </div>
             
-            <h1 className="text-2xl font-bold text-slate-900 mt-1 mb-6">
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white mt-1 mb-2">
               {authStep === "profile" ? "Create your profile" : "Welcome to Signal"}
             </h1>
+            
+            <p className="text-sm text-slate-500 dark:text-neutral-400 text-center mb-6">
+              {authStep === "identifier" && (mode === "login" ? "Enter your details to log in to your account." : "Enter your details to create a new account.")}
+              {authStep === "code" && "Enter the 4-digit verification code."}
+              {authStep === "profile" && "Set how you appear to your contacts."}
+            </p>
 
             {/* Error Message */}
             {error && (
-              <div className="w-full mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100 text-center">
+              <div className="w-full mb-6 p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100 text-center font-medium animate-in fade-in slide-in-from-top-2">
                 {error}
               </div>
             )}
@@ -111,28 +117,24 @@ export default function Home() {
               <div className="w-full flex flex-col gap-6">
                 
                 {/* Prominent Login/Signup Toggle */}
-                <div className="flex bg-slate-100 p-1 rounded-xl">
-                  <button type="button" onClick={() => setMode("login")} className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${mode === 'login' ? 'bg-white shadow-sm text-[#2C6BED]' : 'text-slate-500 hover:text-slate-700'}`}>Log In</button>
-                  <button type="button" onClick={() => setMode("register")} className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${mode === 'register' ? 'bg-white shadow-sm text-[#2C6BED]' : 'text-slate-500 hover:text-slate-700'}`}>Sign Up</button>
+                <div className="flex bg-slate-100 dark:bg-[#121214] p-1 rounded-xl -mt-2">
+                  <button type="button" onClick={() => setMode("login")} className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${mode === 'login' ? 'bg-white dark:bg-[#202124] shadow-sm text-[#2C6BED]' : 'text-slate-500 dark:text-neutral-500 hover:text-slate-700 dark:hover:text-neutral-300'}`}>Log In</button>
+                  <button type="button" onClick={() => setMode("register")} className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${mode === 'register' ? 'bg-white dark:bg-[#202124] shadow-sm text-[#2C6BED]' : 'text-slate-500 dark:text-neutral-500 hover:text-slate-700 dark:hover:text-neutral-300'}`}>Sign Up</button>
                 </div>
                 
-                <p className="text-sm text-slate-500 text-center -mt-2 mb-2">
-                  {mode === "login" ? "Enter your details to log in to your account." : "Enter your details to create a new account."}
-                </p>
-                
                 {/* Identifier Type Segmented Toggle */}
-                <div className="flex bg-slate-50 p-1 rounded-xl border border-slate-100">
-                  <button type="button" onClick={() => setIdentifierType("phone")} className={`flex-1 py-1.5 text-xs font-medium rounded-lg transition-all ${identifierType === 'phone' ? 'bg-white shadow-sm text-slate-900 border border-slate-200/60' : 'text-slate-400 hover:text-slate-600'}`}>Phone Number</button>
-                  <button type="button" onClick={() => setIdentifierType("username")} className={`flex-1 py-1.5 text-xs font-medium rounded-lg transition-all ${identifierType === 'username' ? 'bg-white shadow-sm text-slate-900 border border-slate-200/60' : 'text-slate-400 hover:text-slate-600'}`}>Username</button>
+                <div className="flex bg-slate-50 dark:bg-[#121214] p-1 rounded-xl border border-slate-100 dark:border-neutral-800">
+                  <button type="button" onClick={() => setIdentifierType("phone")} className={`flex-1 py-1.5 text-xs font-medium rounded-lg transition-all ${identifierType === 'phone' ? 'bg-white dark:bg-[#202124] shadow-sm text-slate-900 dark:text-white border border-slate-200/60 dark:border-neutral-800' : 'text-slate-400 dark:text-neutral-500 hover:text-slate-600 dark:hover:text-neutral-300'}`}>Phone Number</button>
+                  <button type="button" onClick={() => setIdentifierType("username")} className={`flex-1 py-1.5 text-xs font-medium rounded-lg transition-all ${identifierType === 'username' ? 'bg-white dark:bg-[#202124] shadow-sm text-slate-900 dark:text-white border border-slate-200/60 dark:border-neutral-800' : 'text-slate-400 dark:text-neutral-500 hover:text-slate-600 dark:hover:text-neutral-300'}`}>Username</button>
                 </div>
 
                 {/* Input Fields */}
                 <div className="w-full">
                   {identifierType === "phone" ? (
-                    <div className="flex items-center bg-white border border-slate-200 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-[#2C6BED]/20 focus-within:border-[#2C6BED] transition-all">
-                      <div className="relative border-r border-slate-200 bg-slate-50 flex items-center group hover:bg-slate-100 transition-colors">
+                    <div className="flex items-center bg-white dark:bg-[#121214] border border-slate-200 dark:border-neutral-800 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-[#2C6BED]/20 focus-within:border-[#2C6BED] transition-all">
+                      <div className="relative border-r border-slate-200 dark:border-neutral-800 bg-slate-50 dark:bg-[#18181b] flex items-center group hover:bg-slate-100 dark:hover:bg-[#202124] transition-colors">
                         <select 
-                          className="appearance-none bg-transparent pl-3 pr-7 py-3 text-sm font-medium text-slate-600 outline-none cursor-pointer relative z-10"
+                          className="appearance-none bg-transparent pl-3 pr-7 py-3 text-sm font-medium text-slate-600 dark:text-neutral-400 outline-none cursor-pointer relative z-10"
                           defaultValue="+1"
                           onChange={(e) => {}}
                         >
@@ -142,26 +144,26 @@ export default function Home() {
                           <option value="+61">🇦🇺 +61</option>
                           <option value="+49">🇩🇪 +49</option>
                         </select>
-                        <span className="material-symbols-outlined text-sm absolute right-2 text-slate-500 pointer-events-none z-0 group-hover:text-slate-700">arrow_drop_down</span>
+                        <span className="material-symbols-outlined text-sm absolute right-2 text-slate-500 dark:text-neutral-500 pointer-events-none z-0 group-hover:text-slate-700 dark:group-hover:text-neutral-300">arrow_drop_down</span>
                       </div>
                       <input 
                         type="tel" 
                         required 
                         autoFocus
-                        className="flex-1 p-3 text-slate-900 outline-none w-full bg-transparent placeholder-slate-400" 
+                        className="flex-1 p-3 text-slate-900 dark:text-white outline-none w-full bg-transparent placeholder-slate-400 dark:placeholder-neutral-600" 
                         placeholder="Phone Number" 
                         value={phone} 
                         onChange={e => setPhone(e.target.value)} 
                       />
                     </div>
                   ) : (
-                    <div className="flex items-center bg-white border border-slate-200 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-[#2C6BED]/20 focus-within:border-[#2C6BED] transition-all">
-                      <div className="px-3 py-3 bg-slate-50 border-r border-slate-200 text-slate-400 font-medium">@</div>
+                    <div className="flex items-center bg-white dark:bg-[#121214] border border-slate-200 dark:border-neutral-800 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-[#2C6BED]/20 focus-within:border-[#2C6BED] transition-all">
+                      <div className="px-3 py-3 bg-slate-50 dark:bg-[#18181b] border-r border-slate-200 dark:border-neutral-800 text-slate-400 dark:text-neutral-500 font-medium">@</div>
                       <input 
                         type="text" 
                         required 
                         autoFocus
-                        className="flex-1 p-3 text-slate-900 outline-none w-full bg-transparent placeholder-slate-400" 
+                        className="flex-1 p-3 text-slate-900 dark:text-white outline-none w-full bg-transparent placeholder-slate-400 dark:placeholder-neutral-600" 
                         placeholder="Username" 
                         value={username} 
                         onChange={e => setUsername(e.target.value)} 
@@ -175,9 +177,6 @@ export default function Home() {
             {/* Step 2: Code */}
             {authStep === "code" && (
               <div className="w-full flex flex-col gap-6">
-                <p className="text-sm text-slate-500 text-center -mt-4 mb-2">
-                  Enter the 4-digit verification code.
-                </p>
                 <div className="flex justify-center gap-3">
                   {[0, 1, 2, 3].map((index) => (
                     <input
@@ -187,7 +186,7 @@ export default function Home() {
                       inputMode="numeric"
                       maxLength={1}
                       autoFocus={index === 0}
-                      className="w-14 h-16 text-center text-3xl font-semibold bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-[#2C6BED]/20 focus:border-[#2C6BED] transition-all shadow-sm"
+                      className="w-14 h-16 text-center text-3xl font-semibold bg-white dark:bg-[#121214] text-slate-900 dark:text-white border border-slate-200 dark:border-neutral-800 rounded-xl outline-none focus:ring-2 focus:ring-[#2C6BED]/20 focus:border-[#2C6BED] transition-all shadow-sm"
                       value={otp[index] || ""}
                       onChange={(e) => {
                         const val = e.target.value;
@@ -210,18 +209,15 @@ export default function Home() {
                     />
                   ))}
                 </div>
-                <p className="text-center text-sm text-slate-500 font-medium">Enter test code: 1234</p>
+                <p className="text-center text-sm text-slate-500 dark:text-neutral-500 font-medium -mt-2">Enter test code: 1234</p>
               </div>
             )}
 
             {/* Step 3: Profile */}
             {authStep === "profile" && (
               <div className="w-full flex flex-col gap-4">
-                <p className="text-sm text-slate-500 text-center -mt-4 mb-2">
-                  Set how you appear to your contacts.
-                </p>
                 <div className="flex justify-center mb-2">
-                  <div className="w-20 h-20 bg-slate-100 rounded-full border border-slate-200 flex items-center justify-center text-slate-400">
+                  <div className="w-20 h-20 bg-slate-100 dark:bg-[#121214] rounded-full border border-slate-200 dark:border-neutral-800 flex items-center justify-center text-slate-400 dark:text-neutral-500">
                     <span className="material-symbols-outlined text-3xl">add_a_photo</span>
                   </div>
                 </div>
@@ -230,7 +226,7 @@ export default function Home() {
                   <input 
                     type="text" 
                     required
-                    className="w-full p-3 bg-white border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-[#2C6BED]/20 focus:border-[#2C6BED] transition-all placeholder-slate-400 text-slate-900" 
+                    className="w-full p-3 bg-white dark:bg-[#121214] border border-slate-200 dark:border-neutral-800 rounded-lg outline-none focus:ring-2 focus:ring-[#2C6BED]/20 focus:border-[#2C6BED] transition-all placeholder-slate-400 dark:placeholder-neutral-600 text-slate-900 dark:text-white" 
                     placeholder="Create a Username" 
                     value={username} 
                     onChange={e => setUsername(e.target.value)} 
@@ -240,7 +236,7 @@ export default function Home() {
                 <input 
                   type="text" 
                   required
-                  className="w-full p-3 bg-white border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-[#2C6BED]/20 focus:border-[#2C6BED] transition-all placeholder-slate-400 text-slate-900" 
+                  className="w-full p-3 bg-white dark:bg-[#121214] border border-slate-200 dark:border-neutral-800 rounded-lg outline-none focus:ring-2 focus:ring-[#2C6BED]/20 focus:border-[#2C6BED] transition-all placeholder-slate-400 dark:placeholder-neutral-600 text-slate-900 dark:text-white" 
                   placeholder="Display Name (e.g. John Doe)" 
                   value={displayName} 
                   onChange={e => setDisplayName(e.target.value)} 
@@ -254,9 +250,9 @@ export default function Home() {
                 {authStep === "profile" ? "Complete Setup" : (mode === "login" ? "Log In →" : "Sign Up →")}
               </button>
               
-              <div className="mt-6 p-4 bg-teal-50/50 rounded-xl border border-teal-100/50 flex items-start gap-3">
-                <span className="material-symbols-outlined text-teal-600 text-xl shrink-0 mt-0.5">verified_user</span>
-                <p className="text-xs text-teal-800/80 leading-relaxed font-medium">
+              <div className="mt-6 p-4 bg-teal-50/50 dark:bg-teal-950/20 rounded-xl border border-teal-100/50 dark:border-teal-900/30 flex items-start gap-3">
+                <span className="material-symbols-outlined text-teal-600 dark:text-teal-500 text-xl shrink-0 mt-0.5">verified_user</span>
+                <p className="text-xs text-teal-800/80 dark:text-teal-400/80 leading-relaxed font-medium">
                   Signal does not sell or share your data. All messages and calls are end-to-end encrypted with zero server logs.
                 </p>
               </div>
