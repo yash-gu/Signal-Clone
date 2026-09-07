@@ -57,6 +57,7 @@ export default function Home() {
           // Register Flow -> Move to Profile Step
           setAuthStep("profile");
         }
+      } else if (authStep === "profile") {
         // Submit Register Flow
         const trimmedUsername = username.trim();
         if (trimmedUsername.length < 3) {
