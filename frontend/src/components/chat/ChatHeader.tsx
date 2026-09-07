@@ -78,6 +78,12 @@ export default function ChatHeader({ showSettings, setShowSettings }: ChatHeader
       </div>
       
       <div className="flex items-center gap-1">
+        <button onClick={() => alert("Voice calls coming soon!")} className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-surface-container-highest text-on-surface-variant transition-colors cursor-pointer" title="Voice Call">
+          <span className="material-symbols-outlined text-[1.375rem]">call</span>
+        </button>
+        <button onClick={() => alert("Video calls coming soon!")} className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-surface-container-highest text-on-surface-variant transition-colors cursor-pointer" title="Video Call">
+          <span className="material-symbols-outlined text-[1.375rem]">videocam</span>
+        </button>
         {!!conversation?.is_group && (
           <button onClick={() => setShowSettings(!showSettings)} className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-surface-container-highest text-on-surface-variant transition-colors cursor-pointer" title="Group Info">
             <span className="material-symbols-outlined text-[1.375rem]">info</span>
