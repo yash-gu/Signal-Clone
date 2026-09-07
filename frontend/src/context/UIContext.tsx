@@ -6,6 +6,8 @@ interface UIContextType {
   toggleLeftRail: () => void;
   activeView: "main" | "settings";
   setActiveView: (view: "main" | "settings") => void;
+  searchTargetId: number | null;
+  setSearchTargetId: (id: number | null) => void;
 }
 
 const UIContext = createContext<UIContextType | undefined>(undefined);
@@ -13,13 +15,14 @@ const UIContext = createContext<UIContextType | undefined>(undefined);
 export function UIProvider({ children }: { children: ReactNode }) {
   const [isLeftRailVisible, setIsLeftRailVisible] = useState(true);
   const [activeView, setActiveView] = useState<"main" | "settings">("main");
+  const [searchTargetId, setSearchTargetId] = useState<number | null>(null);
 
   const toggleLeftRail = () => {
     setIsLeftRailVisible(prev => !prev);
   };
 
   return (
-    <UIContext.Provider value={{ isLeftRailVisible, toggleLeftRail, activeView, setActiveView }}>
+    <UIContext.Provider value={{ isLeftRailVisible, toggleLeftRail, activeView, setActiveView, searchTargetId, setSearchTargetId }}>
       {children}
     </UIContext.Provider>
   );

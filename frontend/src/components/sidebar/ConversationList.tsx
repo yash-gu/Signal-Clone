@@ -31,8 +31,11 @@ const formatMessageTime = (dateString: string | null) => {
   return date.toLocaleDateString('en-IN', { month: 'short', day: 'numeric', timeZone: 'Asia/Kolkata' });
 };
 
+import { useUI } from "@/context/UIContext";
+
 export default function ConversationList() {
   const { token, user } = useAuth();
+  const { searchTargetId, setSearchTargetId } = useUI();
   const { activeConversation, setActiveConversation, messages, refreshConversationsTrigger } = useSocket();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -95,18 +98,49 @@ export default function ConversationList() {
       console.error("Error creating direct conversation", e);
     }
   };
+  const searchTargetConv = searchTargetId ? conversations.find(c => c.id === searchTargetId) : null;
+  
+  let targetName = "";
+  if (searchTargetConv) {
+    if (searchTargetConv.is_group) {
+        targetName = searchTargetConv.name || "Group";
+    } else {
+        const otherUser = searchTargetConv.participants?.find((p: any) => p.user_id !== user?.id)?.user;
+        targetName = otherUser ? (otherUser.display_name || otherUser.username || "Unknown") : "Note to Self";
+    }
+  }
+
   return (
     <>
       {/* Filter Tabs / Search Bar */}
       <div className="px-4 pb-3 flex items-center gap-2">
-        <div className="relative flex-1 flex items-center">
-          <span className="material-symbols-outlined absolute left-3 text-slate-400 dark:text-neutral-500 text-[18px] pointer-events-none">search</span>
+        <div className="relative flex-1 flex items-center bg-slate-100 dark:bg-[#2a2b2e] rounded-xl border border-transparent dark:border-[#383a3f] overflow-hidden focus-within:ring-1 focus-within:ring-blue-500">
+          <span className="material-symbols-outlined pl-3 text-slate-400 dark:text-neutral-500 text-[18px] pointer-events-none shrink-0">search</span>
+          
+          {searchTargetConv && (
+            <div className="flex items-center gap-1.5 ml-2 pl-1 pr-1.5 py-0.5 shrink-0 max-w-[140px] border-r border-slate-300 dark:border-neutral-600">
+              <div className={`w-5 h-5 rounded-full text-[10px] flex items-center justify-center shrink-0 ${searchTargetConv.is_group ? 'bg-[#f6f0ce] dark:bg-[#4a452a] text-[#795f00] dark:text-[#f6f0ce]' : 'bg-[#c3e6cb] dark:bg-[#2a4534] text-[#155724] dark:text-[#c3e6cb]'}`}>
+                {searchTargetConv.is_group ? (
+                   <span className="material-symbols-outlined text-[14px]">group</span>
+                ) : (
+                   <span className="font-semibold text-[10px]">
+                     {targetName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || targetName.charAt(0).toUpperCase()}
+                   </span>
+                )}
+              </div>
+              <span className="text-xs font-medium truncate text-slate-700 dark:text-neutral-200">{targetName}</span>
+              <button onClick={() => setSearchTargetId(null)} className="flex items-center text-slate-400 hover:text-slate-600 dark:text-neutral-500 dark:hover:text-neutral-300">
+                 <span className="material-symbols-outlined text-[14px]">close</span>
+              </button>
+            </div>
+          )}
+
           <input 
             type="text" 
-            placeholder={filterUnread ? "Search unread chats" : "Search"} 
+            placeholder={searchTargetConv ? "Search chat" : filterUnread ? "Search unread chats" : "Search"} 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-slate-100 dark:bg-[#2a2b2e] text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-neutral-500 pl-9 pr-8 py-2 rounded-xl text-sm outline-none focus:ring-1 focus:ring-blue-500 transition-all border border-transparent dark:border-[#383a3f]"
+            className="w-full bg-transparent text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-neutral-500 pl-2 pr-8 py-2 text-sm outline-none transition-all"
           />
           {searchQuery && (
              <button onClick={() => setSearchQuery("")} className="absolute right-2 text-slate-400 hover:text-slate-600 dark:text-neutral-500 dark:hover:text-neutral-300">

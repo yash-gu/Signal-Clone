@@ -56,7 +56,10 @@ export default function SettingsView() {
         </div>
         
         <nav className="flex-1 overflow-y-auto px-2 py-2 space-y-0.5">
-          <button className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors text-slate-600 dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-white/5`}>
+          <button 
+            onClick={() => setActiveTab("general")}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${activeTab === 'general' ? 'bg-slate-200 dark:bg-white/10 text-slate-900 dark:text-white' : 'text-slate-600 dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-white/5'}`}
+          >
             <span className="material-symbols-outlined text-[20px] text-slate-400 dark:text-neutral-400">settings</span> General
           </button>
           <button 
@@ -65,22 +68,40 @@ export default function SettingsView() {
           >
             <span className="material-symbols-outlined text-[20px] text-slate-400 dark:text-neutral-400">brightness_medium</span> Appearance
           </button>
-          <button className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors text-slate-600 dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-white/5`}>
+          <button 
+            onClick={() => setActiveTab("chats")}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${activeTab === 'chats' ? 'bg-slate-200 dark:bg-white/10 text-slate-900 dark:text-white' : 'text-slate-600 dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-white/5'}`}
+          >
             <span className="material-symbols-outlined text-[20px] text-slate-400 dark:text-neutral-400">chat_bubble</span> Chats
           </button>
-          <button className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors text-slate-600 dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-white/5`}>
+          <button 
+            onClick={() => setActiveTab("calls")}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${activeTab === 'calls' ? 'bg-slate-200 dark:bg-white/10 text-slate-900 dark:text-white' : 'text-slate-600 dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-white/5'}`}
+          >
             <span className="material-symbols-outlined text-[20px] text-slate-400 dark:text-neutral-400">call</span> Calls
           </button>
-          <button className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors text-slate-600 dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-white/5`}>
+          <button 
+            onClick={() => setActiveTab("notifications")}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${activeTab === 'notifications' ? 'bg-slate-200 dark:bg-white/10 text-slate-900 dark:text-white' : 'text-slate-600 dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-white/5'}`}
+          >
             <span className="material-symbols-outlined text-[20px] text-slate-400 dark:text-neutral-400">notifications</span> Notifications
           </button>
-          <button className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors text-slate-600 dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-white/5`}>
+          <button 
+            onClick={() => setActiveTab("privacy")}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${activeTab === 'privacy' ? 'bg-slate-200 dark:bg-white/10 text-slate-900 dark:text-white' : 'text-slate-600 dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-white/5'}`}
+          >
             <span className="material-symbols-outlined text-[20px] text-slate-400 dark:text-neutral-400">lock</span> Privacy
           </button>
-          <button className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors text-slate-600 dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-white/5`}>
+          <button 
+            onClick={() => setActiveTab("data_usage")}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${activeTab === 'data_usage' ? 'bg-slate-200 dark:bg-white/10 text-slate-900 dark:text-white' : 'text-slate-600 dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-white/5'}`}
+          >
             <span className="material-symbols-outlined text-[20px] text-slate-400 dark:text-neutral-400">data_usage</span> Data usage
           </button>
-          <button className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors text-slate-600 dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-white/5`}>
+          <button 
+            onClick={() => setActiveTab("backups")}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${activeTab === 'backups' ? 'bg-slate-200 dark:bg-white/10 text-slate-900 dark:text-white' : 'text-slate-600 dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-white/5'}`}
+          >
             <span className="material-symbols-outlined text-[20px] text-slate-400 dark:text-neutral-400">history</span> Backups
           </button>
         </nav>
@@ -370,6 +391,26 @@ export default function SettingsView() {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Coming Soon Placeholder */}
+        {!["profile", "appearance"].includes(activeTab) && (
+          <div className="flex flex-col w-full h-full">
+            <div className="h-14 flex items-center px-4 shrink-0 bg-white dark:bg-[#18181b] border-b border-slate-200 dark:border-neutral-800">
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-white capitalize">
+                {activeTab.replace('_', ' ')}
+              </h2>
+            </div>
+            <div className="flex-1 flex flex-col items-center justify-center p-8 animate-in fade-in">
+              <div className="w-20 h-20 bg-slate-200 dark:bg-[#202124] rounded-full flex items-center justify-center mb-6">
+                <span className="material-symbols-outlined text-[40px] text-slate-400 dark:text-neutral-500">construction</span>
+              </div>
+              <h3 className="text-xl font-medium text-slate-900 dark:text-white mb-2">Coming Soon</h3>
+              <p className="text-slate-500 dark:text-neutral-400 text-center max-w-sm">
+                These settings are currently under construction and will be available in a future update.
+              </p>
             </div>
           </div>
         )}

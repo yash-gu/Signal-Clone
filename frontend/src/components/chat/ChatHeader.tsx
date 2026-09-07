@@ -3,6 +3,7 @@ import { useSocket } from "@/context/SocketContext";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
 import GroupSettingsPanel from "./GroupSettingsPanel";
+import { useUI } from "@/context/UIContext";
 
 interface Conversation {
   id: number;
@@ -19,6 +20,7 @@ interface ChatHeaderProps {
 export default function ChatHeader({ showSettings, setShowSettings }: ChatHeaderProps) {
   const { activeConversation, setActiveConversation, typingUser } = useSocket();
   const { token, user } = useAuth();
+  const { setSearchTargetId } = useUI();
   const [conversation, setConversation] = useState<Conversation | null>(null);
   const [otherUserStatus, setOtherUserStatus] = useState<{ is_online: boolean; last_seen: string | null } | null>(null);
 
@@ -126,8 +128,15 @@ export default function ChatHeader({ showSettings, setShowSettings }: ChatHeader
       </div>
       
       <div className="flex items-center gap-1 relative chat-header-dropdown">
-        <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-200 dark:hover:bg-neutral-800 text-slate-600 dark:text-neutral-400 transition-colors" title="Search">
-          <span className="material-symbols-outlined text-[1.375rem]">search</span>
+        <button 
+          onClick={() => {
+            if (activeConversation) {
+              setSearchTargetId(activeConversation);
+            }
+          }}
+          className="w-10 h-10 rounded-full flex items-center justify-center text-slate-600 hover:bg-slate-100 dark:text-neutral-400 dark:hover:bg-white/10 dark:hover:text-white transition-colors"
+        >
+          <span className="material-symbols-outlined text-[24px]">search</span>
         </button>
         <button 
           onClick={() => setShowDropdown(!showDropdown)} 
@@ -139,7 +148,13 @@ export default function ChatHeader({ showSettings, setShowSettings }: ChatHeader
 
         {showDropdown && (
           <div className="absolute top-12 right-0 w-56 bg-white dark:bg-[#202124] rounded-2xl shadow-lg border border-slate-200 dark:border-neutral-800 py-2 z-50 animate-in fade-in slide-in-from-top-2">
-            <button onClick={() => alert("Disappearing messages coming soon!")} className="w-full flex items-center justify-between px-4 py-2 text-sm text-slate-700 dark:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
+            <button 
+              onClick={() => {
+                setShowSettings(true);
+                setShowDropdown(false);
+              }} 
+              className="w-full flex items-center justify-between px-4 py-2 text-sm text-slate-700 dark:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
+            >
               <div className="flex items-center gap-3">
                 <span className="material-symbols-outlined text-[20px] text-slate-500 dark:text-neutral-400">timer</span>
                 Disappearing messages
