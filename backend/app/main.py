@@ -25,8 +25,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-os.makedirs("backend/uploads", exist_ok=True)
-app.mount("/uploads", StaticFiles(directory="backend/uploads"), name="uploads")
+os.makedirs("data/uploads", exist_ok=True)
+app.mount("/uploads", StaticFiles(directory="data/uploads"), name="uploads")
 
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 app.include_router(users.router, prefix="/api/users", tags=["users"])

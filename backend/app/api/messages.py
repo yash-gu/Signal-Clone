@@ -15,10 +15,10 @@ router = APIRouter()
 
 @router.post("/upload")
 async def upload_attachment(file: UploadFile = File(...), current_user: dict = Depends(get_current_user)):
-    os.makedirs("backend/uploads", exist_ok=True)
+    os.makedirs("data/uploads", exist_ok=True)
     ext = file.filename.split(".")[-1] if "." in file.filename else ""
     filename = f"{uuid.uuid4().hex}.{ext}"
-    file_path = os.path.join("backend/uploads", filename)
+    file_path = os.path.join("data/uploads", filename)
     
     with open(file_path, "wb") as f:
         content = await file.read()
