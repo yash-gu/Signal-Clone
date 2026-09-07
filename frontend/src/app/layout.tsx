@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: "Signal Desktop Clone",
   description: "A functional clone of the Signal messaging application.",
   icons: {
-    icon: '/logo.png',
+    icon: '/icon.png',
   }
 };
 
