@@ -2,12 +2,14 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from app.db.database import init_db
+from app.db.seed import seed_db
 from app.api import auth, users, conversations, messages
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
     await init_db()
+    await seed_db()
     yield
     # Shutdown
 

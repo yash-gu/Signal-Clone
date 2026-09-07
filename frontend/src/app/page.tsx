@@ -186,6 +186,13 @@ export default function Home() {
                     </div>
                   )}
                 </div>
+                
+                {/* Evaluator Hint */}
+                {mode === "login" && (
+                  <p className="text-center text-sm text-slate-500 dark:text-neutral-500 font-medium -mt-2">
+                    Evaluator Test Account: <strong>1111111111</strong> or <strong>sarah_chen</strong>
+                  </p>
+                )}
               </div>
             )}
 
