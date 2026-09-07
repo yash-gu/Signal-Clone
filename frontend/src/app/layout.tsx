@@ -1,7 +1,7 @@
-import type { Metadata } from "next";
 import "./globals.css";
 import TopNav from "@/components/layout/TopNav";
 import LeftRail from "@/components/layout/LeftRail";
+import Providers from "@/context/Providers";
 
 export const metadata: Metadata = {
   title: "Signal Desktop Clone",
@@ -23,13 +23,15 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
       </head>
       <body>
-        <TopNav />
-        <LeftRail />
-        <div className="pl-16">
-          <main className="pt-16 w-full min-h-screen">
-            {children}
-          </main>
-        </div>
+        <Providers>
+          <TopNav />
+          <LeftRail />
+          <div className="pl-16">
+            <main className="pt-16 w-full min-h-screen">
+              {children}
+            </main>
+          </div>
+        </Providers>
       </body>
     </html>
   );
