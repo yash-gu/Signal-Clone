@@ -12,11 +12,11 @@ from app.db.database import init_db
 async def seed_db():
     await init_db()
     async with aiosqlite.connect(settings.DATABASE_URL) as db:
-        # Check if users exist
-        async with db.execute("SELECT COUNT(*) FROM users") as cursor:
+        # Check if the specific mock user exists
+        async with db.execute("SELECT COUNT(*) FROM users WHERE username = 'sarah_chen'") as cursor:
             count = (await cursor.fetchone())[0]
             if count > 0:
-                print("Database already seeded.")
+                print("Mock data already seeded.")
                 return
         # Create users
         users = [
