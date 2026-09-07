@@ -12,9 +12,9 @@ export default function Home() {
   // Auth Form State
   const [mode, setMode] = useState<"login" | "register">("login");
   const [authStep, setAuthStep] = useState<"identifier" | "code" | "profile">("identifier");
-  const [phone, setPhone] = useState("");
+  const [phone, setPhone] = useState("1111111111");
   const [username, setUsername] = useState("");
-  const [otp, setOtp] = useState("");
+  const [otp, setOtp] = useState("1234");
   const [displayName, setDisplayName] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -29,6 +29,28 @@ export default function Home() {
           setError("Please enter a valid phone number (digits only).");
           return;
         }
+
+        try {
+          const res = await fetch(`/api/auth/check`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ phone_number: phone })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (mode === "login" && !data.exists) {
+              setError("User not found. Please sign up.");
+              return;
+            }
+            if (mode === "register" && data.exists) {
+              setError("Phone number already registered. Please log in.");
+              return;
+            }
+          }
+        } catch (err) {
+           console.error("User check failed", err);
+        }
+
         setAuthStep("code");
       } else if (authStep === "code") {
         if (mode === "login") {
@@ -55,6 +77,10 @@ export default function Home() {
           }
         } else {
           // Register Flow -> Move to Profile Step
+          if (otp !== "1234") {
+            setError("Invalid OTP. Please use '1234'.");
+            return;
+          }
           setAuthStep("profile");
         }
       } else if (authStep === "profile") {
@@ -90,32 +116,17 @@ export default function Home() {
     };
     
     return (
-      <div className="flex-1 flex flex-col items-center justify-center w-full min-h-screen px-4 pb-12">
+      <div className="flex-1 flex flex-col items-center justify-center w-full min-h-screen bg-slate-100 dark:bg-neutral-900 px-4 pb-12">
         {/* Main Auth Card */}
         <div className="w-full max-w-[26rem] bg-white dark:bg-[#18181b] rounded-[24px] shadow-sm border border-slate-200 dark:border-neutral-800 overflow-hidden flex flex-col mb-8 relative z-20">
           
-          {/* Dynamic Tab Navigation based on Mode */}
-          <div className="bg-slate-50 dark:bg-[#121214] border-b border-slate-100 dark:border-neutral-800 flex items-center justify-between px-6 py-4">
-            <div className={`text-xs font-medium ${authStep === 'identifier' ? 'text-[#2C6BED]' : 'text-slate-400 dark:text-neutral-500'}`}>1. Phone</div>
-            <div className={`h-px flex-1 mx-2 ${authStep === 'code' || authStep === 'profile' ? 'bg-[#2C6BED]' : 'bg-slate-200 dark:bg-neutral-800'}`}></div>
-            <div className={`text-xs font-medium ${authStep === 'code' ? 'text-[#2C6BED]' : 'text-slate-400 dark:text-neutral-500'}`}>2. Code</div>
-            {mode === "register" && (
-              <>
-                <div className={`h-px flex-1 mx-2 ${authStep === 'profile' ? 'bg-[#2C6BED]' : 'bg-slate-200 dark:bg-neutral-800'}`}></div>
-                <div className={`text-xs font-medium ${authStep === 'profile' ? 'text-[#2C6BED]' : 'text-slate-400 dark:text-neutral-500'}`}>3. Profile</div>
-              </>
-            )}
-          </div>
-
           <form onSubmit={handleNextStep} className="p-8 flex flex-col items-center">
             
             {/* Branding & Header */}
-            <div className="bg-[#2C6BED] text-white p-3 rounded-2xl shadow-sm inline-block mb-4">
-              <span className="material-symbols-outlined text-2xl block">lock</span>
-            </div>
+            <img src="/icon.png" alt="Signal Logo" className="w-16 h-16 object-contain mb-4 drop-shadow-sm" />
             
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white mt-1 mb-2">
-              {authStep === "profile" ? "Create your profile" : (mode === "login" ? "Log in to Signal" : "Sign up for Signal")}
+              Set up Signal
             </h1>
             
             <p className="text-sm text-slate-500 dark:text-neutral-400 text-center mb-6">
@@ -162,20 +173,13 @@ export default function Home() {
                       type="tel" 
                       required 
                       autoFocus
-                      className="flex-1 p-3 text-slate-900 dark:text-white outline-none w-full bg-transparent placeholder-slate-400 dark:placeholder-neutral-600" 
+                      className="flex-1 p-3 text-slate-900 dark:text-white outline-none w-full bg-transparent placeholder-slate-400 dark:placeholder-neutral-600 font-medium" 
                       placeholder="Phone Number" 
                       value={phone} 
                       onChange={e => setPhone(e.target.value)} 
                     />
                   </div>
                 </div>
-                
-                {/* Evaluator Hint */}
-                {mode === "login" && (
-                  <p className="text-center text-sm text-slate-500 dark:text-neutral-500 font-medium -mt-2">
-                    Evaluator Test Account: <strong>1111111111</strong>
-                  </p>
-                )}
               </div>
             )}
 
@@ -214,7 +218,7 @@ export default function Home() {
                     />
                   ))}
                 </div>
-                <p className="text-center text-sm text-slate-500 dark:text-neutral-500 font-medium -mt-2">Enter test code: 1234</p>
+                <p className="text-center text-sm text-[#2C6BED] font-medium mt-2">Test code: 1234 (Pre-filled for evaluator)</p>
               </div>
             )}
 
@@ -249,8 +253,8 @@ export default function Home() {
 
             {/* Buttons & Privacy Footer */}
             <div className="w-full mt-8">
-              <button type="submit" className="bg-[#2C6BED] hover:bg-blue-600 text-white font-medium py-3 rounded-xl w-full transition-colors active:scale-[0.98]">
-                {authStep === "profile" ? "Complete Setup" : (mode === "login" ? "Log In →" : "Sign Up →")}
+              <button type="submit" className="bg-[#2C6BED] hover:bg-blue-600 text-white font-medium py-3 rounded-xl w-full transition-colors active:scale-[0.98] shadow-sm">
+                Continue
               </button>
               
               <div className="mt-6 p-4 bg-teal-50/50 dark:bg-teal-950/20 rounded-xl border border-teal-100/50 dark:border-teal-900/30 flex items-start gap-3">

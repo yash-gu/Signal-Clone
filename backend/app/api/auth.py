@@ -8,6 +8,24 @@ import re
 
 router = APIRouter()
 
+from pydantic import BaseModel
+
+class CheckUserRequest(BaseModel):
+    phone_number: str = None
+    username: str = None
+
+@router.post("/check")
+async def check_user(req: CheckUserRequest, db: aiosqlite.Connection = Depends(get_db)):
+    if req.username:
+        async with db.execute("SELECT id FROM users WHERE username = ?", (req.username,)) as cursor:
+            user = await cursor.fetchone()
+    elif req.phone_number:
+        async with db.execute("SELECT id FROM users WHERE phone_number = ?", (req.phone_number,)) as cursor:
+            user = await cursor.fetchone()
+    else:
+        raise HTTPException(status_code=400, detail="Must provide phone_number or username")
+    return {"exists": bool(user)}
+
 @router.post("/register", response_model=TokenResponse)
 async def register(req: RegisterRequest, db: aiosqlite.Connection = Depends(get_db)):
     if req.otp != "1234":
