@@ -1,5 +1,7 @@
 # Signal Web Clone
 
+**Live Demo**: [http://13.206.77.155:8765/](http://13.206.77.155:8765/)
+
 A high-fidelity desktop web clone of Signal Messenger, built with a modern, modular architecture. It emphasizes privacy UX, clean typography, low-latency messaging, and UI parity with the original desktop app.
 
 ## Features
