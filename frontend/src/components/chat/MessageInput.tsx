@@ -139,7 +139,7 @@ export default function MessageInput() {
                 </div>
               )}
             </div>
-            <button className="w-8 h-8 flex items-center justify-center hover:text-on-surface transition-colors cursor-pointer" title="Voice note" type="button">
+            <button onClick={() => alert("Voice notes coming soon!")} className="w-8 h-8 flex items-center justify-center hover:text-on-surface transition-colors cursor-pointer" title="Voice note" type="button">
               <span className="material-symbols-outlined text-xl">mic</span>
             </button>
           </div>

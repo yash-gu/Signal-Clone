@@ -146,7 +146,6 @@ export default function ConversationList() {
               ))
             )}
           </div>
-          </div>
         ) : (() => {
           const displayedConversations = filterUnread ? conversations.filter(c => c.unread_count > 0) : conversations;
           if (displayedConversations.length === 0) {

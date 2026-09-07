@@ -1,11 +1,10 @@
 export default function SecurityBanner() {
   return (
-    <div className="py-space-xs px-space-base bg-surface-container flex justify-center items-center gap-space-xs shadow-xs z-10">
-      <span className="material-symbols-outlined text-secondary text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>lock</span>
-      <span className="font-label-sm text-label-sm text-on-surface font-medium">End-to-end encrypted</span>
-      <span className="font-timestamp text-timestamp text-outline-variant">•</span>
-      <span className="font-code-sm text-[0.6875rem] text-on-surface-variant">Curve25519 Double Ratchet</span>
-      <button onClick={() => alert("Simulating E2E Encryption: Safety Number Verification successful!")} className="ml-space-xs text-primary font-label-sm text-label-sm underline hover:text-on-primary-fixed-variant cursor-pointer">Verify Safety Numbers</button>
+    <div className="py-3 px-4 flex justify-center items-center gap-2 z-10">
+      <span className="material-symbols-outlined text-slate-400 dark:text-neutral-500 text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>lock</span>
+      <span className="text-xs text-slate-500 dark:text-neutral-400 font-medium">
+        Messages and calls are end-to-end encrypted.
+      </span>
     </div>
   );
 }
