@@ -9,6 +9,7 @@ export interface Message {
   content: string;
   status: "SENT" | "DELIVERED" | "READ";
   created_at: string;
+  sender_name?: string;
 }
 
 interface SocketContextType {
@@ -33,11 +34,20 @@ export function SocketProvider({ children }: { children: ReactNode }) {
   // Re-fetch messages when active conversation changes
   useEffect(() => {
     if (activeConversation && token) {
-      fetch(`http://localhost:8000/api/messages/${activeConversation}`, {
+      fetch(`/api/messages/${activeConversation}`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       .then(res => res.json())
-      .then(data => setMessages(Array.isArray(data) ? data : []))
+      .then(data => {
+        setMessages(Array.isArray(data) ? data : []);
+        // Automatically send a read receipt when we open a conversation
+        if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+          socketRef.current.send(JSON.stringify({
+            action: "messages_read",
+            conversation_id: activeConversation
+          }));
+        }
+      })
       .catch(console.error);
     } else {
       setMessages([]);
@@ -47,13 +57,46 @@ export function SocketProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!token) return;
 
-    const ws = new WebSocket(`ws://localhost:8000/api/messages/ws?token=${token}`);
+    const ws = new WebSocket(`${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}/api/messages/ws?token=${token}`);
     socketRef.current = ws;
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data.type === "new_message") {
         setMessages((prev) => [...prev, data.message]);
+        
+        // If we received a message from someone else, mark it as delivered
+        if (data.message.sender_id !== user?.id) {
+          ws.send(JSON.stringify({
+            action: "message_delivered",
+            message_id: data.message.id,
+            conversation_id: data.message.conversation_id
+          }));
+          
+          // If we are actively looking at this conversation, mark as read
+          if (activeConversation === data.message.conversation_id) {
+            ws.send(JSON.stringify({
+              action: "messages_read",
+              conversation_id: data.message.conversation_id
+            }));
+          }
+        }
+      } else if (data.type === "message_status_update") {
+        // Update the status of a specific message
+        if (data.conversation_id === activeConversation) {
+          setMessages(prev => prev.map(msg => 
+            msg.id === data.message_id ? { ...msg, status: data.status } : msg
+          ));
+        }
+      } else if (data.type === "conversation_read") {
+        // Mark all outgoing messages in this conversation as READ
+        if (data.conversation_id === activeConversation) {
+          setMessages(prev => prev.map(msg => 
+            (msg.sender_id === user?.id && (msg.status === "SENT" || msg.status === "DELIVERED")) 
+              ? { ...msg, status: "READ" } 
+              : msg
+          ));
+        }
       } else if (data.type === "typing") {
         if (data.conversation_id === activeConversation) {
           setTypingUser(data.user_id);

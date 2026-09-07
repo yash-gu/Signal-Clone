@@ -5,6 +5,7 @@ class RegisterRequest(BaseModel):
     phone_number: str
     username: str
     display_name: str
+    otp: str
 
 class LoginRequest(BaseModel):
     phone_number: str
@@ -26,3 +27,13 @@ class ConversationResponse(BaseModel):
     is_group: bool
     name: Optional[str] = None
     created_at: str
+    last_message: Optional[str] = None
+    last_message_time: Optional[str] = None
+    unread_count: int = 0
+
+class GroupCreateRequest(BaseModel):
+    name: str
+    contact_ids: List[int]
+
+class AddParticipantRequest(BaseModel):
+    user_id: int

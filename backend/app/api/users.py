@@ -12,11 +12,19 @@ async def get_me(current_user: dict = Depends(get_current_user)):
     return current_user
 
 @router.get("/search", response_model=List[UserResponse])
-async def search_users(q: str = Query(...), db: aiosqlite.Connection = Depends(get_db)):
+async def search_users(q: str, current_user: dict = Depends(get_current_user), db: aiosqlite.Connection = Depends(get_db)):
+    if not q or len(q) < 2:
+        return []
+        
+    query = '''
+        SELECT id, phone_number, username, display_name, avatar_url 
+        FROM users 
+        WHERE (username LIKE ? OR display_name LIKE ? OR phone_number LIKE ?)
+          AND id != ?
+        LIMIT 20
+    '''
     search_term = f"%{q}%"
-    async with db.execute(
-        "SELECT id, phone_number, username, display_name, avatar_url FROM users WHERE username LIKE ? OR phone_number LIKE ?",
-        (search_term, search_term)
-    ) as cursor:
+    async with db.execute(query, (search_term, search_term, search_term, current_user['id'])) as cursor:
         rows = await cursor.fetchall()
         return [dict(row) for row in rows]
+

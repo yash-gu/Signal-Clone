@@ -8,6 +8,8 @@ router = APIRouter()
 
 @router.post("/register", response_model=TokenResponse)
 async def register(req: RegisterRequest, db: aiosqlite.Connection = Depends(get_db)):
+    if req.otp != "1234":
+        raise HTTPException(status_code=401, detail="Invalid OTP. Please use '1234'.")
     try:
         await db.execute(
             "INSERT INTO users (phone_number, username, display_name) VALUES (?, ?, ?)",

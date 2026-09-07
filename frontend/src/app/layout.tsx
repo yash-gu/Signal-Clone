@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import "./globals.css";
 import TopNav from "@/components/layout/TopNav";
 import LeftRail from "@/components/layout/LeftRail";
@@ -22,12 +23,14 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
       </head>
-      <body>
+      <body className="bg-surface text-on-surface font-body-md text-body-md antialiased" style={{ overscrollBehavior: 'none' }}>
         <Providers>
-          <TopNav />
-          <LeftRail />
-          <div className="pl-16">
-            <main className="pt-16 w-full min-h-screen">
+          <div className="hidden md:block">
+            <TopNav />
+            <LeftRail />
+          </div>
+          <div className="md:pl-16 w-full min-h-[100dvh] flex flex-col">
+            <main className="md:pt-16 w-full flex-1 flex flex-col h-full">
               {children}
             </main>
           </div>

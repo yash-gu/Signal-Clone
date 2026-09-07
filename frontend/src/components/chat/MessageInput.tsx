@@ -1,7 +1,29 @@
+"use client";
+import { useSocket } from "@/context/SocketContext";
+import { useState } from "react";
+
 export default function MessageInput() {
+  const { sendMessage, sendTyping } = useSocket();
+  const [content, setContent] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (content.trim()) {
+      sendMessage(content.trim());
+      setContent("");
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      handleSubmit(e as any);
+    } else {
+      sendTyping();
+    }
+  };
   return (
     <footer className="p-space-base bg-surface-container-lowest shadow-md z-20">
-      <form className="flex items-center gap-space-sm max-w-chat-max-width mx-auto">
+      <form onSubmit={handleSubmit} className="flex items-center gap-space-sm max-w-chat-max-width mx-auto">
         <button className="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-colors cursor-pointer" title="Attach file or photo" type="button">
           <span className="material-symbols-outlined text-2xl">attach_file</span>
         </button>
@@ -11,6 +33,9 @@ export default function MessageInput() {
             className="w-full bg-transparent text-on-surface placeholder:text-outline font-body-md text-body-md outline-none py-1.5 pr-20" 
             placeholder="Signal message" 
             type="text"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            onKeyDown={handleKeyDown}
           />
           <div className="absolute right-3 flex items-center gap-space-2xs text-outline">
             <button className="w-8 h-8 flex items-center justify-center hover:text-on-surface transition-colors cursor-pointer" title="Insert Emoji" type="button">

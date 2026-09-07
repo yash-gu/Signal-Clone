@@ -1,3 +1,4 @@
+"use client";
 export default function TopNav() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-surface/85 backdrop-blur-xl border-b border-outline-variant/30">
@@ -12,11 +13,6 @@ export default function TopNav() {
             <span className="font-headline-sm text-headline-sm text-on-surface tracking-tight">Signal</span>
           </div>
           <div className="h-4 w-px bg-outline-variant/40 hidden md:block"></div>
-          <nav className="flex items-center gap-space-xs">
-            <a aria-current="page" className="px-space-md py-space-xs rounded-xl transition-colors bg-surface-container-high text-on-surface font-semibold" href="#">Chats</a>
-            <a className="px-space-md py-space-xs rounded-xl font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" href="#">New Group</a>
-            <a className="px-space-md py-space-xs rounded-xl font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" href="#">Account Setup</a>
-          </nav>
         </div>
         <div className="flex items-center gap-space-md">
           <div className="flex items-center gap-space-xs bg-surface-container-low px-space-sm py-space-2xs rounded-full">

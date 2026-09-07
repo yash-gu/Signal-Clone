@@ -1,6 +1,19 @@
+"use client";
 import MessageBubble from "./MessageBubble";
+import { useSocket } from "@/context/SocketContext";
+import { useAuth } from "@/context/AuthContext";
+import { useEffect, useRef } from "react";
 
 export default function MessageList() {
+  const { messages, activeConversation, typingUser } = useSocket();
+  const { user } = useAuth();
+  const anchorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    anchorRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, typingUser]);
+
+  if (!activeConversation) return null;
   return (
     <div className="flex-1 overflow-y-auto px-space-xl py-space-lg space-y-space-md z-0 flex flex-col justify-start" id="message-container">
       <div className="flex items-center justify-center my-space-base">
@@ -9,33 +22,25 @@ export default function MessageList() {
         </span>
       </div>
       
-      <MessageBubble 
-        isOutgoing={false}
-        content="Hey Sarah! Did you push the latest commit for the Signal protocol upgrade?"
-        timestamp="12:40 PM"
-      />
+      {messages.map((msg) => (
+        <MessageBubble 
+          key={msg.id}
+          isOutgoing={msg.sender_id === user?.id}
+          content={msg.content}
+          timestamp={new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          status={msg.status}
+          senderName={msg.sender_name}
+        />
+      ))}
       
-      <MessageBubble 
-        isOutgoing={true}
-        content="Just did! All automated tests passed and the handshake is verified."
-        timestamp="12:42 PM"
-        status="READ"
-      />
+      {typingUser && (
+        <div className="text-on-surface-variant text-sm flex items-center gap-2 italic">
+          <span className="w-1.5 h-1.5 rounded-full bg-secondary inline-block animate-pulse"></span>
+          User is typing...
+        </div>
+      )}
       
-      <MessageBubble 
-        isOutgoing={false}
-        content="Awesome. Let me know when you want to run the live test session."
-        timestamp="12:44 PM"
-      />
-      
-      <MessageBubble 
-        isOutgoing={true}
-        content="Sounds good! See you at 4pm then"
-        timestamp="12:45 PM"
-        status="DELIVERED"
-      />
-      
-      <div id="new-messages-anchor"></div>
+      <div id="new-messages-anchor" ref={anchorRef}></div>
     </div>
   );
 }

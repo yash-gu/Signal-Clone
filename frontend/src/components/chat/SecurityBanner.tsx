@@ -5,7 +5,7 @@ export default function SecurityBanner() {
       <span className="font-label-sm text-label-sm text-on-surface font-medium">End-to-end encrypted</span>
       <span className="font-timestamp text-timestamp text-outline-variant">•</span>
       <span className="font-code-sm text-[0.6875rem] text-on-surface-variant">Curve25519 Double Ratchet</span>
-      <button className="ml-space-xs text-primary font-label-sm text-label-sm underline hover:text-on-primary-fixed-variant cursor-pointer">Verify Safety Numbers</button>
+      <button onClick={() => alert("Simulating E2E Encryption: Safety Number Verification successful!")} className="ml-space-xs text-primary font-label-sm text-label-sm underline hover:text-on-primary-fixed-variant cursor-pointer">Verify Safety Numbers</button>
     </div>
   );
 }
