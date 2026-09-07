@@ -7,10 +7,6 @@ import { ToastProvider } from "@/context/ToastContext";
 export const metadata: Metadata = {
   title: "Signal Desktop Clone",
   description: "A functional clone of the Signal messaging application.",
-  icons: {
-    icon: "/icon.png",
-    apple: "/icon.png",
-  },
   openGraph: {
     images: ["/icon.png"],
   },
