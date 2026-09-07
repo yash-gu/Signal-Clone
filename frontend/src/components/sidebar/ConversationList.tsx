@@ -210,7 +210,7 @@ export default function ConversationList() {
                     {displayName}
                   </span>
                   <span className={`text-[11px] font-medium whitespace-nowrap ml-2 ${conv.unread_count > 0 ? "text-blue-600 dark:text-blue-400" : "text-slate-400 dark:text-neutral-500"}`}>
-                    {new Date(conv.last_message_time || conv.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                    {new Date(conv.last_message_time || conv.created_at).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', timeZone: 'Asia/Kolkata' })}
                   </span>
                 </div>
                 <div className="flex items-center justify-between gap-2">

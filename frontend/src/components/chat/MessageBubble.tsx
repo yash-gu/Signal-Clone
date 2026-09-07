@@ -13,7 +13,7 @@ export default function MessageBubble({
   const { user } = useAuth();
   const { content, status, sender_name, created_at, attachment_url, reply_to_id, reactions, id } = msg;
 
-  const timestamp = new Date(created_at).toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit', hour12: true }).toUpperCase();
+  const timestamp = new Date(created_at).toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' }).toUpperCase();
   const quotedMessage = reply_to_id ? messages.find(m => m.id === reply_to_id) : null;
   const myReaction = reactions?.find(r => r.user_id === user?.id);
 

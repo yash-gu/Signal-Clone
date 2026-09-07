@@ -48,10 +48,47 @@ export function SocketProvider({ children }: { children: ReactNode }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [typingUser, setTypingUser] = useState<{ id: number; name: string } | null>(null);
   const [replyingTo, setReplyingTo] = useState<Message | null>(null);
-  const [expiresIn, setExpiresIn] = useState<number | null>(null);
+  const [expiresIn, setExpiresInState] = useState<number | null>(null);
   const [refreshConversationsTrigger, setRefreshConversationsTrigger] = useState(0);
   const socketRef = useRef<WebSocket | null>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const setExpiresIn = (seconds: number | null) => {
+    setExpiresInState(seconds);
+    if (activeConversation) {
+      if (seconds === null) {
+        localStorage.removeItem(`expiresIn_${activeConversation}`);
+      } else {
+        localStorage.setItem(`expiresIn_${activeConversation}`, seconds.toString());
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (activeConversation) {
+      const saved = localStorage.getItem(`expiresIn_${activeConversation}`);
+      setExpiresInState(saved ? parseInt(saved) : null);
+    } else {
+      setExpiresInState(null);
+    }
+  }, [activeConversation]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setMessages(prev => {
+        const now = new Date();
+        const next = prev.filter(m => {
+          if (!m.expires_at) return true;
+          let dateStr = m.expires_at;
+          if (!dateStr.includes('T')) dateStr = dateStr.replace(' ', 'T');
+          if (!dateStr.endsWith('Z') && !dateStr.includes('+')) dateStr += 'Z';
+          return new Date(dateStr) > now;
+        });
+        return next.length !== prev.length ? next : prev;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const refreshConversations = () => {
     setRefreshConversationsTrigger(prev => prev + 1);
