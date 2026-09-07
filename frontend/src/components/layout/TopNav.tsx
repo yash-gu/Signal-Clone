@@ -8,7 +8,7 @@ export default function TopNav() {
             <img 
               alt="Signal Messenger Logo" 
               className="h-8 w-auto object-contain" 
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsVliTSUnzQTMtGl1WHRXFkQtCjmADqCj1z_DikSgT3mjI0ux_D43fRpJwsWX9Sp6pKuFA2Xqd2Bwv5RN4Mv6OhiU3I6SiMioPSRceXplehNNHjDaU5n3sEyxkCRuEn3zlFdgLlc2unuovmRAIAh1sT1Vfg1emNamhR7DmVMBkgjZ2UtFJc3PxoVhJ0bGteydmCLB37oRkkX2vdpp9bYn5jsSJ8x_I6I7Vy-Z0WvIprZRA_Jcg0Gxf"
+              src="/logo.png"
             />
             <span className="font-headline-sm text-headline-sm text-on-surface tracking-tight">Signal</span>
           </div>

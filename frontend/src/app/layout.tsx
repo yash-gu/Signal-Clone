@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import TopNav from "@/components/layout/TopNav";
-import LeftRail from "@/components/layout/LeftRail";
 import Providers from "@/context/Providers";
+import AppLayout from "@/components/layout/AppLayout";
 
 export const metadata: Metadata = {
   title: "Signal Desktop Clone",
   description: "A functional clone of the Signal messaging application.",
+  icons: {
+    icon: '/logo.png',
+  }
 };
 
 export default function RootLayout({
@@ -25,15 +27,9 @@ export default function RootLayout({
       </head>
       <body className="bg-surface text-on-surface font-body-md text-body-md antialiased" style={{ overscrollBehavior: 'none' }}>
         <Providers>
-          <div className="hidden md:block">
-            <TopNav />
-            <LeftRail />
-          </div>
-          <div className="md:pl-16 w-full min-h-[100dvh] flex flex-col">
-            <main className="md:pt-16 w-full flex-1 flex flex-col h-full">
-              {children}
-            </main>
-          </div>
+          <AppLayout>
+            {children}
+          </AppLayout>
         </Providers>
       </body>
     </html>

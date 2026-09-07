@@ -3,112 +3,252 @@ import Sidebar from "@/components/sidebar";
 import ChatPane from "@/components/chat";
 import { useAuth } from "@/context/AuthContext";
 import { useSocket } from "@/context/SocketContext";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export default function Home() {
-  const { token, login, loading } = useAuth();
+  const { token, login } = useAuth();
   const { activeConversation } = useSocket();
-  const [mode, setMode] = useState<"login" | "register">("login");
-  const [phone, setPhone] = useState("1111111111");
-  const [otp, setOtp] = useState("1234");
+  
+  // Auth Form State
+  const [authStep, setAuthStep] = useState<"identifier" | "code" | "profile">("identifier");
+  const [identifierType, setIdentifierType] = useState<"phone" | "username">("phone");
+  const [phone, setPhone] = useState("");
   const [username, setUsername] = useState("");
+  const [otp, setOtp] = useState("");
   const [displayName, setDisplayName] = useState("");
-
-  if (loading) return <div className="flex h-screen items-center justify-center bg-surface">Loading...</div>;
+  const [error, setError] = useState<string | null>(null);
 
   if (!token) {
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleNextStep = async (e: React.FormEvent) => {
       e.preventDefault();
-      try {
-        if (mode === "login") {
-          const res = await fetch(`/api/auth/login`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ phone_number: phone, otp })
-          });
-          if (res.ok) {
-            const data = await res.json();
-            login(data.access_token);
-          } else {
-            alert("Login failed. Check your phone number/OTP.");
+      setError(null);
+      
+      if (authStep === "identifier") {
+        setAuthStep("code");
+      } else if (authStep === "code") {
+        if (identifierType === "phone") {
+          // Login Flow
+          try {
+            const res = await fetch(`/api/auth/login`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ phone_number: phone, otp })
+            });
+            if (res.ok) {
+              const data = await res.json();
+              login(data.access_token);
+            } else {
+              const data = await res.json();
+              if (res.status === 404) {
+                // User not found, need to register
+                setAuthStep("profile");
+              } else {
+                setError(data.detail || "Invalid code. Try 1234.");
+              }
+            }
+          } catch (err) {
+            setError("Server not responding.");
           }
         } else {
+          // Username login logic goes here if backend supports it. For now, fallback to profile registration.
+          setAuthStep("profile");
+        }
+      } else if (authStep === "profile") {
+        // Register Flow
+        try {
           const res = await fetch(`/api/auth/register`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ phone_number: phone, username, display_name: displayName, otp })
+            body: JSON.stringify({ phone_number: phone || "0000000000", username, display_name: displayName, otp: otp || "1234" })
           });
           if (res.ok) {
             const data = await res.json();
             login(data.access_token);
           } else {
-            const err = await res.json();
-            alert(`Registration failed: ${err.detail}`);
+            const data = await res.json();
+            setError(data.detail || "Registration failed.");
           }
+        } catch (err) {
+          setError("Server not responding.");
         }
-      } catch (err) {
-        alert("Server not responding. Is the backend running?");
       }
     };
     
     return (
-      <div className="flex h-screen items-center justify-center bg-surface w-full">
-        <form onSubmit={handleSubmit} className="p-8 bg-surface-container-low rounded-2xl shadow-sm w-[28rem] border border-outline-variant/30 flex flex-col">
-          <div className="flex justify-center mb-6">
-            <span className="font-headline-sm text-headline-sm text-on-surface tracking-tight flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary text-3xl">chat</span>
-              Signal Web Clone
-            </span>
-          </div>
+      <div className="flex-1 flex flex-col items-center justify-center w-full min-h-screen px-4 pb-12">
+        {/* Main Auth Card */}
+        <div className="w-full max-w-[26rem] bg-white rounded-[24px] shadow-sm border border-slate-200 overflow-hidden flex flex-col mb-8 relative z-20">
           
-          {/* Tabs */}
-          <div className="flex gap-2 mb-6 bg-surface-container p-1 rounded-lg">
-            <button type="button" onClick={() => setMode("login")} className={`flex-1 py-2 rounded-md font-label-md transition-all ${mode === "login" ? "bg-surface-container-lowest shadow-xs text-on-surface" : "text-on-surface-variant hover:text-on-surface"}`}>Login</button>
-            <button type="button" onClick={() => { setMode("register"); setPhone(""); }} className={`flex-1 py-2 rounded-md font-label-md transition-all ${mode === "register" ? "bg-surface-container-lowest shadow-xs text-on-surface" : "text-on-surface-variant hover:text-on-surface"}`}>Register</button>
+          {/* 3-Step Tab Navigation */}
+          <div className="bg-slate-50 border-b border-slate-100 flex items-center justify-between px-6 py-4">
+            <div className={`text-xs font-medium ${authStep === 'identifier' ? 'text-[#2C6BED]' : 'text-slate-400'}`}>1. Identifier</div>
+            <div className={`h-px flex-1 mx-2 ${authStep === 'code' || authStep === 'profile' ? 'bg-[#2C6BED]' : 'bg-slate-200'}`}></div>
+            <div className={`text-xs font-medium ${authStep === 'code' ? 'text-[#2C6BED]' : 'text-slate-400'}`}>2. Code</div>
+            <div className={`h-px flex-1 mx-2 ${authStep === 'profile' ? 'bg-[#2C6BED]' : 'bg-slate-200'}`}></div>
+            <div className={`text-xs font-medium ${authStep === 'profile' ? 'text-[#2C6BED]' : 'text-slate-400'}`}>3. Profile</div>
           </div>
 
-          <div className="space-y-4 mb-8">
-            <div>
-              <label className="block text-label-sm font-label-sm text-on-surface-variant mb-1 ml-1">Phone Number</label>
-              <input required className="block w-full p-3 rounded-xl bg-surface-container-highest text-on-surface outline-none focus:ring-2 ring-primary transition-all" value={phone} onChange={e => setPhone(e.target.value)} placeholder="e.g. 5550123" />
-            </div>
+          <form onSubmit={handleNextStep} className="p-8 flex flex-col items-center">
             
-            {mode === "register" && (
-              <>
-                <div>
-                  <label className="block text-label-sm font-label-sm text-on-surface-variant mb-1 ml-1">Username</label>
-                  <input required className="block w-full p-3 rounded-xl bg-surface-container-highest text-on-surface outline-none focus:ring-2 ring-primary transition-all" value={username} onChange={e => setUsername(e.target.value)} placeholder="e.g. myusername" />
-                </div>
-                <div>
-                  <label className="block text-label-sm font-label-sm text-on-surface-variant mb-1 ml-1">Display Name</label>
-                  <input required className="block w-full p-3 rounded-xl bg-surface-container-highest text-on-surface outline-none focus:ring-2 ring-primary transition-all" value={displayName} onChange={e => setDisplayName(e.target.value)} placeholder="e.g. John Doe" />
-                </div>
-              </>
+            {/* Branding & Header */}
+            <div className="bg-[#2C6BED] text-white p-3 rounded-2xl shadow-sm inline-block mb-4">
+              <span className="material-symbols-outlined text-2xl block">lock</span>
+            </div>
+            <h1 className="text-2xl font-bold text-slate-900 mt-1 mb-2">
+              {authStep === "profile" ? "Create your profile" : "Set up Signal"}
+            </h1>
+            <p className="text-sm text-slate-500 text-center mb-8">
+              {authStep === "identifier" && "Enter your phone number or username to get started."}
+              {authStep === "code" && "Enter the 4-digit verification code."}
+              {authStep === "profile" && "Set how you appear to your contacts."}
+            </p>
+
+            {/* Error Message */}
+            {error && (
+              <div className="w-full mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100 text-center">
+                {error}
+              </div>
             )}
 
-            <div>
-              <label className="block text-label-sm font-label-sm text-on-surface-variant mb-1 ml-1">Mock OTP Code (Use 1234)</label>
-              <input required className="block w-full p-3 rounded-xl bg-surface-container-highest text-on-surface outline-none focus:ring-2 ring-primary transition-all" value={otp} onChange={e => setOtp(e.target.value)} placeholder="1234" />
-            </div>
-          </div>
+            {/* Step 1: Identifier */}
+            {authStep === "identifier" && (
+              <div className="w-full flex flex-col gap-6">
+                
+                {/* Segmented Toggle */}
+                <div className="flex bg-slate-100 p-1 rounded-xl">
+                  <button type="button" onClick={() => setIdentifierType("phone")} className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${identifierType === 'phone' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}>Phone Number</button>
+                  <button type="button" onClick={() => setIdentifierType("username")} className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${identifierType === 'username' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}>Username</button>
+                </div>
 
-          <button type="submit" className="bg-primary text-on-primary font-label-md text-label-md w-full py-3 rounded-full hover:brightness-110 active:scale-95 transition-all shadow-sm mt-auto">
-            {mode === "login" ? "Login to Signal" : "Complete Registration"}
-          </button>
-        </form>
+                {/* Input Fields */}
+                <div className="w-full">
+                  {identifierType === "phone" ? (
+                    <div className="flex items-center bg-white border border-slate-200 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-[#2C6BED]/20 focus-within:border-[#2C6BED] transition-all">
+                      <div className="px-3 py-3 bg-slate-50 border-r border-slate-200 text-slate-600 text-sm font-medium flex items-center gap-1 cursor-not-allowed">
+                        🇺🇸 +1 <span className="material-symbols-outlined text-sm">arrow_drop_down</span>
+                      </div>
+                      <input 
+                        type="tel" 
+                        required 
+                        autoFocus
+                        className="flex-1 p-3 text-slate-900 outline-none w-full bg-transparent placeholder-slate-400" 
+                        placeholder="Phone Number" 
+                        value={phone} 
+                        onChange={e => setPhone(e.target.value)} 
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex items-center bg-white border border-slate-200 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-[#2C6BED]/20 focus-within:border-[#2C6BED] transition-all">
+                      <div className="px-3 py-3 bg-slate-50 border-r border-slate-200 text-slate-400 font-medium">@</div>
+                      <input 
+                        type="text" 
+                        required 
+                        autoFocus
+                        className="flex-1 p-3 text-slate-900 outline-none w-full bg-transparent placeholder-slate-400" 
+                        placeholder="Username" 
+                        value={username} 
+                        onChange={e => setUsername(e.target.value)} 
+                      />
+                    </div>
+                  )}
+                </div>
+                
+                {/* Small Muted Badge */}
+                <div className="flex justify-center">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-100 text-slate-500 text-xs font-mono border border-slate-200/60">
+                    <span className="material-symbols-outlined text-[14px]">lock</span> 
+                    SMS Protocol Token: SHA-256
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Step 2: Code */}
+            {authStep === "code" && (
+              <div className="w-full flex flex-col gap-6">
+                <input 
+                  type="text" 
+                  required 
+                  autoFocus
+                  className="w-full p-4 text-center text-2xl tracking-[0.5em] font-mono bg-white border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-[#2C6BED]/20 focus:border-[#2C6BED] transition-all placeholder-slate-300" 
+                  placeholder="----" 
+                  maxLength={4}
+                  value={otp} 
+                  onChange={e => setOtp(e.target.value)} 
+                />
+              </div>
+            )}
+
+            {/* Step 3: Profile */}
+            {authStep === "profile" && (
+              <div className="w-full flex flex-col gap-4">
+                <div className="flex justify-center mb-2">
+                  <div className="w-20 h-20 bg-slate-100 rounded-full border border-slate-200 flex items-center justify-center text-slate-400">
+                    <span className="material-symbols-outlined text-3xl">add_a_photo</span>
+                  </div>
+                </div>
+                
+                {identifierType === "phone" && (
+                  <input 
+                    type="text" 
+                    required
+                    className="w-full p-3 bg-white border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-[#2C6BED]/20 focus:border-[#2C6BED] transition-all placeholder-slate-400 text-slate-900" 
+                    placeholder="Create a Username" 
+                    value={username} 
+                    onChange={e => setUsername(e.target.value)} 
+                  />
+                )}
+                
+                <input 
+                  type="text" 
+                  required
+                  className="w-full p-3 bg-white border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-[#2C6BED]/20 focus:border-[#2C6BED] transition-all placeholder-slate-400 text-slate-900" 
+                  placeholder="Display Name (e.g. John Doe)" 
+                  value={displayName} 
+                  onChange={e => setDisplayName(e.target.value)} 
+                />
+              </div>
+            )}
+
+            {/* Buttons & Privacy Footer */}
+            <div className="w-full mt-8">
+              <button type="submit" className="bg-[#2C6BED] hover:bg-blue-600 text-white font-medium py-3 rounded-xl w-full transition-colors active:scale-[0.98]">
+                {authStep === "profile" ? "Complete Setup" : "Continue →"}
+              </button>
+              
+              <div className="mt-6 p-4 bg-teal-50/50 rounded-xl border border-teal-100/50 flex items-start gap-3">
+                <span className="material-symbols-outlined text-teal-600 text-xl shrink-0 mt-0.5">verified_user</span>
+                <p className="text-xs text-teal-800/80 leading-relaxed font-medium">
+                  Signal does not sell or share your data. All messages and calls are end-to-end encrypted with zero server logs.
+                </p>
+              </div>
+            </div>
+
+          </form>
+        </div>
+
+        {/* Muted Bottom Watermark */}
+        <div className="text-center text-[11px] font-medium text-slate-400/80 uppercase tracking-widest flex flex-wrap justify-center gap-2 max-w-lg mt-auto relative z-10">
+          <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[13px]">lock</span> Post-quantum ready Double Ratchet</span>
+          <span>•</span>
+          <span>Zero telemetry logs</span>
+          <span>•</span>
+          <span>Signal Protocol v4</span>
+        </div>
       </div>
     );
   }
 
+  // Authenticated State (Handled by AppLayout structure)
   return (
     <div className="flex flex-col w-full h-full">
       <div className="flex w-full h-full md:h-[calc(100vh-4rem)] overflow-hidden">
-        {/* Sidebar - Show if no active conversation on mobile, always show on desktop */}
+        {/* Sidebar */}
         <div className={`w-full md:w-96 flex-shrink-0 border-r border-outline-variant/30 ${activeConversation ? 'hidden md:flex' : 'flex'} h-[100dvh] md:h-auto`}>
           <Sidebar />
         </div>
         
-        {/* ChatPane - Show if active conversation on mobile, always show on desktop */}
+        {/* ChatPane */}
         <div className={`flex-1 min-w-0 ${activeConversation ? 'flex' : 'hidden md:flex'} h-[100dvh] md:h-auto`}>
           <ChatPane />
         </div>
