@@ -83,9 +83,6 @@ export default function SettingsView() {
           <button className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors text-slate-600 dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-white/5`}>
             <span className="material-symbols-outlined text-[20px] text-slate-400 dark:text-neutral-400">history</span> Backups
           </button>
-          <button className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors text-slate-600 dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-white/5`}>
-            <span className="material-symbols-outlined text-[20px] text-slate-400 dark:text-neutral-400">favorite</span> Donate to Signal
-          </button>
         </nav>
       </div>
 

@@ -27,21 +27,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   const { isLeftRailVisible, activeView } = useUI();
 
-  // Settings Layout
-  if (activeView === "settings") {
-    return (
-      <div className="w-full h-screen overflow-hidden flex bg-white dark:bg-[#121214]">
-        <SettingsView />
-      </div>
-    );
-  }
-
   // Authenticated layout (Standard app with sidebars and navigation)
   return (
     <div className="w-full h-screen overflow-hidden flex bg-white dark:bg-[#121214]">
       {isLeftRailVisible && <LeftRail />}
       <main className="flex-1 flex h-full min-w-0">
-        {children}
+        {activeView === "settings" ? <SettingsView /> : children}
       </main>
     </div>
   );

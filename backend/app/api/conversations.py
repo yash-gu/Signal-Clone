@@ -14,6 +14,8 @@ async def get_conversations(current_user: dict = Depends(get_current_user), db: 
         SELECT c.id, c.is_group, c.name, c.created_at,
                (SELECT CASE WHEN content != '' THEN content WHEN attachment_url IS NOT NULL THEN 'Photo' ELSE '' END FROM messages m WHERE m.conversation_id = c.id ORDER BY created_at DESC LIMIT 1) as last_message,
                (SELECT created_at FROM messages m WHERE m.conversation_id = c.id ORDER BY created_at DESC LIMIT 1) as last_message_time,
+               (SELECT sender_id FROM messages m WHERE m.conversation_id = c.id ORDER BY created_at DESC LIMIT 1) as last_message_sender_id,
+               (SELECT status FROM messages m WHERE m.conversation_id = c.id ORDER BY created_at DESC LIMIT 1) as last_message_status,
                (SELECT COUNT(*) FROM messages m WHERE m.conversation_id = c.id AND m.sender_id != ? AND m.status IN ('SENT', 'DELIVERED')) as unread_count
         FROM conversations c
         JOIN participants p ON c.id = p.conversation_id

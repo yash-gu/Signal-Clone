@@ -11,8 +11,25 @@ interface Conversation {
   created_at: string;
   last_message?: string | null;
   last_message_time?: string | null;
+  last_message_sender_id?: number | null;
+  last_message_status?: string | null;
   unread_count: number;
 }
+
+const formatMessageTime = (dateString: string | null) => {
+  if (!dateString) return "";
+  const date = new Date(dateString + 'Z');
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMins / 60);
+  
+  if (diffMins < 1) return "Now";
+  if (diffMins < 60) return `${diffMins}m`;
+  if (diffHours < 24) return `${diffHours}h`;
+  if (diffHours < 48) return "Yesterday";
+  return date.toLocaleDateString('en-IN', { month: 'short', day: 'numeric', timeZone: 'Asia/Kolkata' });
+};
 
 export default function ConversationList() {
   const { token, user } = useAuth();
@@ -214,36 +231,41 @@ export default function ConversationList() {
             >
               {isActive && <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-600 dark:bg-blue-500 rounded-r-full"></div>}
               <div className="relative flex-shrink-0 w-12 h-12">
-                <div className="w-full h-full rounded-full bg-slate-200 dark:bg-[#383a3f] text-slate-700 dark:text-neutral-200 flex items-center justify-center shadow-sm overflow-hidden">
+                <div className={`w-full h-full rounded-full text-slate-700 dark:text-neutral-200 flex items-center justify-center shadow-sm overflow-hidden ${conv.is_group ? 'bg-[#f6f0ce] dark:bg-[#4a452a] text-[#795f00] dark:text-[#f6f0ce]' : 'bg-[#c3e6cb] dark:bg-[#2a4534] text-[#155724] dark:text-[#c3e6cb]'}`}>
                    {conv.is_group ? (
-                     <span className="material-symbols-outlined text-[20px]">hub</span>
+                     <span className="material-symbols-outlined text-[24px]">group</span>
                    ) : avatarUrl ? (
                      <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover" />
                    ) : (
                      <span className="font-semibold text-lg flex items-center justify-center">
-                       {displayName.charAt(0).toUpperCase()}
+                       {displayName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || displayName.charAt(0).toUpperCase()}
                      </span>
                    )}
                 </div>
-                {!conv.is_group && (
-                  <span className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-white dark:bg-[#202124] rounded-full flex items-center justify-center shadow-sm">
-                    <span className="material-symbols-outlined text-green-500 dark:text-green-400 text-[12px]" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
-                  </span>
-                )}
               </div>
               <div className="flex-1 min-w-0 flex flex-col justify-center">
                 <div className="flex items-baseline justify-between mb-1">
-                  <span className={`text-sm truncate ${conv.unread_count > 0 ? "text-slate-900 dark:text-white font-bold" : "text-slate-900 dark:text-neutral-200 font-medium"}`}>
-                    {displayName}
-                  </span>
+                  <div className="flex items-center gap-1 min-w-0">
+                    <span className={`text-sm truncate ${conv.unread_count > 0 ? "text-slate-900 dark:text-white font-bold" : "text-slate-900 dark:text-neutral-200 font-medium"}`}>
+                      {displayName}
+                    </span>
+                    {!conv.is_group && (
+                      <span className="material-symbols-outlined text-blue-500 dark:text-blue-400 text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+                    )}
+                  </div>
                   <span className={`text-[11px] font-medium whitespace-nowrap ml-2 ${conv.unread_count > 0 ? "text-blue-600 dark:text-blue-400" : "text-slate-400 dark:text-neutral-500"}`}>
-                    {new Date(conv.last_message_time || conv.created_at).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', timeZone: 'Asia/Kolkata' })}
+                    {formatMessageTime(conv.last_message_time || conv.created_at)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between gap-2">
-                  <p className={`text-xs truncate ${conv.unread_count > 0 ? "text-slate-900 dark:text-white font-semibold" : "text-slate-500 dark:text-neutral-400"}`}>
-                    {conv.last_message || "No messages yet"}
-                  </p>
+                  <div className="flex items-center gap-1 min-w-0">
+                    {conv.last_message_sender_id === user?.id && !conv.unread_count && (
+                      <span className="material-symbols-outlined text-[14px] text-slate-400 dark:text-neutral-500 shrink-0" style={{ fontVariationSettings: "'FILL' 0" }}>done_all</span>
+                    )}
+                    <p className={`text-xs truncate ${conv.unread_count > 0 ? "text-slate-900 dark:text-white font-semibold" : "text-slate-500 dark:text-neutral-400"}`}>
+                      {conv.last_message || "No messages yet"}
+                    </p>
+                  </div>
                   {conv.unread_count > 0 && (
                     <span className="flex-shrink-0 w-5 h-5 bg-blue-600 dark:bg-blue-500 text-white rounded-full flex items-center justify-center text-[10px] font-bold shadow-sm">
                       {conv.unread_count > 99 ? '99+' : conv.unread_count}

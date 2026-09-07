@@ -119,7 +119,7 @@ export default function ChatHeader({ showSettings, setShowSettings }: ChatHeader
           <div className="flex items-center gap-1.5">
             <span className={`w-1.5 h-1.5 rounded-full ${otherUserStatus?.is_online ? 'bg-secondary' : 'bg-slate-400 dark:bg-neutral-500'}`}></span>
             <span className="font-label-sm text-label-sm text-on-surface-variant font-normal truncate">
-              {typingUser ? `${typingUser.name} is typing...` : conversation?.is_group ? "Group Chat" : otherUserStatus?.is_online ? "online" : otherUserStatus?.last_seen ? `last seen ${new Date(otherUserStatus.last_seen + 'Z').toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', hour: 'numeric', minute: '2-digit', day: 'numeric', month: 'short' })}` : "offline"} <span className="text-outline-variant">•</span> end-to-end encrypted
+              {typingUser ? `${typingUser.name} is typing...` : conversation?.is_group ? "Group Chat" : otherUserStatus?.is_online ? "online" : otherUserStatus?.last_seen ? `last seen ${new Date(otherUserStatus.last_seen + 'Z').toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', hour: 'numeric', minute: '2-digit', day: 'numeric', month: 'short' })}` : "offline"}
             </span>
           </div>
         </div>
