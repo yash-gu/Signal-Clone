@@ -57,10 +57,14 @@ export default function Home() {
           // Register Flow -> Move to Profile Step
           setAuthStep("profile");
         }
-      } else if (authStep === "profile") {
         // Submit Register Flow
-        if (username.trim().length < 3) {
+        const trimmedUsername = username.trim();
+        if (trimmedUsername.length < 3) {
           setError("Please enter a valid username (min 3 chars).");
+          return;
+        }
+        if (!/^[a-zA-Z0-9_]+$/.test(trimmedUsername)) {
+          setError("Username can only contain letters, numbers, and underscores (no spaces).");
           return;
         }
         
