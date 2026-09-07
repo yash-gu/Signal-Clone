@@ -116,7 +116,7 @@ export default function Home() {
     };
     
     return (
-      <div className="flex-1 flex flex-col items-center justify-center w-full min-h-screen bg-slate-100 dark:bg-neutral-900 px-4 pb-12">
+      <div className="relative flex-1 flex flex-col items-center justify-center w-full min-h-screen bg-slate-100 dark:bg-neutral-900 px-4 pb-12">
         {/* Main Auth Card */}
         <div className="w-full max-w-[26rem] bg-white dark:bg-[#18181b] rounded-[24px] shadow-sm border border-slate-200 dark:border-neutral-800 overflow-hidden flex flex-col mb-8 relative z-20">
           
@@ -269,7 +269,7 @@ export default function Home() {
         </div>
 
         {/* Muted Bottom Watermark */}
-        <div className="text-center text-[11px] font-medium text-slate-400/80 uppercase tracking-widest flex flex-wrap justify-center gap-2 max-w-lg mt-auto relative z-10">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-full text-center text-[11px] font-medium text-slate-400/80 uppercase tracking-widest flex flex-wrap justify-center gap-2 max-w-lg z-10">
           <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[13px]">lock</span> Post-quantum ready Double Ratchet</span>
           <span>•</span>
           <span>Zero telemetry logs</span>
