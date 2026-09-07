@@ -35,6 +35,8 @@ interface SocketContextType {
   setReplyingTo: (msg: Message | null) => void;
   expiresIn: number | null;
   setExpiresIn: (seconds: number | null) => void;
+  refreshConversations: () => void;
+  refreshConversationsTrigger: number;
 }
 
 const SocketContext = createContext<SocketContextType | undefined>(undefined);
@@ -47,8 +49,13 @@ export function SocketProvider({ children }: { children: ReactNode }) {
   const [typingUser, setTypingUser] = useState<number | null>(null);
   const [replyingTo, setReplyingTo] = useState<Message | null>(null);
   const [expiresIn, setExpiresIn] = useState<number | null>(null);
+  const [refreshConversationsTrigger, setRefreshConversationsTrigger] = useState(0);
   const socketRef = useRef<WebSocket | null>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const refreshConversations = () => {
+    setRefreshConversationsTrigger(prev => prev + 1);
+  };
 
   // Re-fetch messages when active conversation changes
   useEffect(() => {
@@ -206,7 +213,9 @@ export function SocketProvider({ children }: { children: ReactNode }) {
       replyingTo,
       setReplyingTo,
       expiresIn,
-      setExpiresIn
+      setExpiresIn,
+      refreshConversations,
+      refreshConversationsTrigger
     }}>
       {children}
     </SocketContext.Provider>

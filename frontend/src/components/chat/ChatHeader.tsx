@@ -11,11 +11,15 @@ interface Conversation {
   participants: any[];
 }
 
-export default function ChatHeader() {
+interface ChatHeaderProps {
+  showSettings: boolean;
+  setShowSettings: (val: boolean) => void;
+}
+
+export default function ChatHeader({ showSettings, setShowSettings }: ChatHeaderProps) {
   const { activeConversation, setActiveConversation, typingUser } = useSocket();
   const { token, user } = useAuth();
   const [conversation, setConversation] = useState<Conversation | null>(null);
-  const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
     if (!activeConversation || !token) return;
@@ -92,14 +96,6 @@ export default function ChatHeader() {
         </button>
       </div>
 
-      {showSettings && conversation && (
-        <div className="absolute top-16 right-0 h-[calc(100vh-4rem)] z-50">
-          <GroupSettingsPanel 
-            conversationId={conversation.id} 
-            onClose={() => setShowSettings(false)} 
-          />
-        </div>
-      )}
     </header>
   );
 }

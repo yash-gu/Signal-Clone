@@ -16,7 +16,7 @@ interface Conversation {
 
 export default function ConversationList() {
   const { token, user } = useAuth();
-  const { activeConversation, setActiveConversation, messages } = useSocket();
+  const { activeConversation, setActiveConversation, messages, refreshConversationsTrigger } = useSocket();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -39,7 +39,7 @@ export default function ConversationList() {
       }
     })
     .catch(console.error);
-  }, [token, messages.length]); // Refresh list when messages arrive
+  }, [token, messages.length, refreshConversationsTrigger]); // Refresh list when messages arrive or trigger changes
 
   // Search logic
   useEffect(() => {

@@ -11,7 +11,7 @@ interface ComposeModalProps {
 
 export default function ComposeModal({ onClose }: ComposeModalProps) {
   const { token } = useAuth();
-  const { setActiveConversation } = useSocket();
+  const { setActiveConversation, refreshConversations } = useSocket();
   
   const [mode, setMode] = useState<"direct" | "group">("direct");
   const [groupName, setGroupName] = useState("");
@@ -112,6 +112,7 @@ export default function ComposeModal({ onClose }: ComposeModalProps) {
       });
       if (res.ok) {
         const data = await res.json();
+        refreshConversations();
         setActiveConversation(data.conversation_id);
         onClose();
       } else {

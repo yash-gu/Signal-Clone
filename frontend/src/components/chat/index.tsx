@@ -3,9 +3,12 @@ import ChatHeader from "./ChatHeader";
 import SecurityBanner from "./SecurityBanner";
 import MessageList from "./MessageList";
 import MessageInput from "./MessageInput";
+import GroupSettingsPanel from "./GroupSettingsPanel";
+import { useState } from "react";
 
 export default function ChatPane() {
   const { activeConversation } = useSocket();
+  const [showSettings, setShowSettings] = useState(false);
 
   if (!activeConversation) {
     return (
@@ -23,11 +26,20 @@ export default function ChatPane() {
   }
 
   return (
-    <section className="flex-1 flex flex-col h-full bg-white dark:bg-[#121214] relative min-w-0">
-      <ChatHeader />
-      <SecurityBanner />
-      <MessageList />
-      <MessageInput />
-    </section>
+    <div className="flex w-full h-full">
+      <section className="flex-1 flex flex-col h-full bg-white dark:bg-[#121214] relative min-w-0">
+        <ChatHeader showSettings={showSettings} setShowSettings={setShowSettings} />
+        <SecurityBanner />
+        <MessageList />
+        <MessageInput />
+      </section>
+      
+      {showSettings && activeConversation && (
+        <GroupSettingsPanel 
+          conversationId={activeConversation} 
+          onClose={() => setShowSettings(false)} 
+        />
+      )}
+    </div>
   );
 }

@@ -172,7 +172,7 @@ export default function GroupSettingsPanel({ conversationId, onClose }: GroupSet
                       <span className="text-sm font-medium text-slate-900 dark:text-white truncate">
                         {isMe ? "You" : u.display_name}
                       </span>
-                      {pIsAdmin && <span className="text-[9px] bg-slate-200 dark:bg-neutral-700 text-slate-600 dark:text-neutral-300 px-1.5 py-0.5 rounded uppercase font-bold tracking-wider">Admin</span>}
+                      {pIsAdmin ? <span className="text-[9px] bg-slate-200 dark:bg-neutral-700 text-slate-600 dark:text-neutral-300 px-1.5 py-0.5 rounded uppercase font-bold tracking-wider">Admin</span> : null}
                     </div>
                   </div>
                   
