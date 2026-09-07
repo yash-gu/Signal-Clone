@@ -71,7 +71,7 @@ export default function ChatHeader({ showSettings, setShowSettings }: ChatHeader
           <div className="flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-secondary"></span>
             <span className="font-label-sm text-label-sm text-on-surface-variant font-normal truncate">
-              {typingUser ? `${conversation?.participants.find(p => p.user_id === typingUser)?.user?.display_name || 'Someone'} is typing...` : "online"} <span className="text-outline-variant">•</span> end-to-end encrypted
+              {typingUser ? `${typingUser.name} is typing...` : "online"} <span className="text-outline-variant">•</span> end-to-end encrypted
             </span>
           </div>
         </div>

@@ -33,7 +33,7 @@ export default function MessageList() {
       {typingUser && (
         <div className="text-on-surface-variant text-sm flex items-center gap-2 italic">
           <span className="w-1.5 h-1.5 rounded-full bg-secondary inline-block animate-pulse"></span>
-          {messages.find(m => m.sender_id === typingUser)?.sender_name || "Someone"} is typing...
+          {typingUser.name} is typing...
         </div>
       )}
       

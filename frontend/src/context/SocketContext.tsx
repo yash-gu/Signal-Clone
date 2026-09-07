@@ -28,7 +28,7 @@ interface SocketContextType {
   setActiveConversation: (id: number | null) => void;
   sendMessage: (content: string, attachment_url?: string, reply_to_id?: number, expires_in?: number) => void;
   sendTyping: () => void;
-  typingUser: number | null;
+  typingUser: { id: number; name: string } | null;
   addReaction: (message_id: number, emoji: string) => void;
   removeReaction: (message_id: number) => void;
   replyingTo: Message | null;
@@ -46,7 +46,7 @@ export function SocketProvider({ children }: { children: ReactNode }) {
   const { showToast } = useToast();
   const [activeConversation, setActiveConversation] = useState<number | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [typingUser, setTypingUser] = useState<number | null>(null);
+  const [typingUser, setTypingUser] = useState<{ id: number; name: string } | null>(null);
   const [replyingTo, setReplyingTo] = useState<Message | null>(null);
   const [expiresIn, setExpiresIn] = useState<number | null>(null);
   const [refreshConversationsTrigger, setRefreshConversationsTrigger] = useState(0);
@@ -130,7 +130,7 @@ export function SocketProvider({ children }: { children: ReactNode }) {
         }
       } else if (data.type === "typing") {
         if (data.conversation_id === activeConversation && data.user_id !== user?.id) {
-          setTypingUser(data.user_id);
+          setTypingUser({ id: data.user_id, name: data.display_name });
           if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
           typingTimeoutRef.current = setTimeout(() => setTypingUser(null), 3000);
         }

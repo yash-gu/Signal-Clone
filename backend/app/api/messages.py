@@ -62,6 +62,15 @@ async def websocket_endpoint(websocket: WebSocket, token: str = Query(...)):
                 if expires_in:
                     expires_at = (datetime.datetime.utcnow() + datetime.timedelta(seconds=expires_in)).isoformat()
                 
+                # Ensure the sender is a participant
+                async with db.execute("SELECT 1 FROM participants WHERE conversation_id = ? AND user_id = ?", (conversation_id, user_id)) as check_cursor:
+                    if not await check_cursor.fetchone():
+                        await manager.send_personal_message(
+                            {"type": "error", "message": "You are no longer a participant in this conversation."},
+                            user_id
+                        )
+                        continue
+                
                 # Persist the message as SENT
                 cursor = await db.execute(
                     "INSERT INTO messages (conversation_id, sender_id, content, status, attachment_url, reply_to_id, expires_at) VALUES (?, ?, ?, 'SENT', ?, ?, ?)",
@@ -125,6 +134,11 @@ async def websocket_endpoint(websocket: WebSocket, token: str = Query(...)):
             
             elif action == "typing":
                 conversation_id = payload.get("conversation_id")
+                
+                async with db.execute("SELECT display_name FROM users WHERE id = ?", (user_id,)) as u_cursor:
+                    u_row = await u_cursor.fetchone()
+                    display_name = u_row["display_name"] if u_row and u_row["display_name"] else "User"
+
                 # Broadcast typing indicator to others in the conversation
                 async with db.execute("SELECT user_id FROM participants WHERE conversation_id = ?", (conversation_id,)) as cursor:
                     participants = await cursor.fetchall()
@@ -132,7 +146,7 @@ async def websocket_endpoint(websocket: WebSocket, token: str = Query(...)):
                         p_id = p["user_id"]
                         if p_id != user_id:
                             await manager.send_personal_message(
-                                {"type": "typing", "conversation_id": conversation_id, "user_id": user_id},
+                                {"type": "typing", "conversation_id": conversation_id, "user_id": user_id, "display_name": display_name},
                                 p_id
                             )
             
