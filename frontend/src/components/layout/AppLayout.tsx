@@ -3,6 +3,7 @@ import React from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useUI } from "@/context/UIContext";
 import LeftRail from "./LeftRail";
+import SettingsView from "@/components/settings/SettingsView";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { token, loading } = useAuth();
@@ -24,7 +25,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     );
   }
 
-  const { isLeftRailVisible } = useUI();
+  const { isLeftRailVisible, activeView } = useUI();
+
+  // Settings Layout
+  if (activeView === "settings") {
+    return (
+      <div className="w-full h-screen overflow-hidden flex bg-white dark:bg-[#121214]">
+        <SettingsView />
+      </div>
+    );
+  }
 
   // Authenticated layout (Standard app with sidebars and navigation)
   return (

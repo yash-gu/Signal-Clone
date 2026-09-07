@@ -1,11 +1,9 @@
 import { useState } from "react";
 import ThemeToggle from "@/components/ui/ThemeToggle";
-import SettingsModal from "@/components/modals/SettingsModal";
 import { useUI } from "@/context/UIContext";
 
 export default function LeftRail() {
-  const [showSettings, setShowSettings] = useState(false);
-  const { toggleLeftRail } = useUI();
+  const { toggleLeftRail, setActiveView } = useUI();
 
   return (
     <aside className="w-14 shrink-0 flex flex-col justify-between items-center py-4 bg-slate-100 dark:bg-[#18181b] border-r border-slate-200 dark:border-neutral-800 z-40 h-full">
@@ -40,7 +38,7 @@ export default function LeftRail() {
 
       <div className="flex flex-col items-center gap-2 mb-2">
         <ThemeToggle />
-        <button onClick={() => setShowSettings(true)} className="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 hover:bg-slate-200 dark:text-neutral-400 dark:hover:text-neutral-200 dark:hover:bg-neutral-800 transition-all cursor-pointer" title="Settings">
+        <button onClick={() => setActiveView("settings")} className="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 hover:bg-slate-200 dark:text-neutral-400 dark:hover:text-neutral-200 dark:hover:bg-neutral-800 transition-all cursor-pointer" title="Settings">
           <span className="material-symbols-outlined text-[20px]">settings</span>
         </button>
         <button onClick={() => {
@@ -50,8 +48,6 @@ export default function LeftRail() {
           <span className="material-symbols-outlined text-[20px]">logout</span>
         </button>
       </div>
-
-      {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
     </aside>
   );
 }

@@ -4,19 +4,22 @@ import React, { createContext, useContext, useState, ReactNode } from "react";
 interface UIContextType {
   isLeftRailVisible: boolean;
   toggleLeftRail: () => void;
+  activeView: "main" | "settings";
+  setActiveView: (view: "main" | "settings") => void;
 }
 
 const UIContext = createContext<UIContextType | undefined>(undefined);
 
 export function UIProvider({ children }: { children: ReactNode }) {
   const [isLeftRailVisible, setIsLeftRailVisible] = useState(true);
+  const [activeView, setActiveView] = useState<"main" | "settings">("main");
 
   const toggleLeftRail = () => {
     setIsLeftRailVisible(prev => !prev);
   };
 
   return (
-    <UIContext.Provider value={{ isLeftRailVisible, toggleLeftRail }}>
+    <UIContext.Provider value={{ isLeftRailVisible, toggleLeftRail, activeView, setActiveView }}>
       {children}
     </UIContext.Provider>
   );
