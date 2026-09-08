@@ -99,6 +99,12 @@ export default function SettingsView() {
             <span className="material-symbols-outlined text-[20px] text-slate-400 dark:text-neutral-400">data_usage</span> Data usage
           </button>
           <button 
+            onClick={() => setActiveTab("linked_devices")}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${activeTab === 'linked_devices' ? 'bg-slate-200 dark:bg-white/10 text-slate-900 dark:text-white' : 'text-slate-600 dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-white/5'}`}
+          >
+            <span className="material-symbols-outlined text-[20px] text-slate-400 dark:text-neutral-400">devices</span> Linked devices
+          </button>
+          <button 
             onClick={() => setActiveTab("backups")}
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${activeTab === 'backups' ? 'bg-slate-200 dark:bg-white/10 text-slate-900 dark:text-white' : 'text-slate-600 dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-white/5'}`}
           >
